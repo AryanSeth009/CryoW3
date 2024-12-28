@@ -149,39 +149,24 @@ export default function NewsPage() {
   };
 
   const fetchNews = async (query: string) => {
-    const API_KEY = process.env.NEXT_PUBLIC_NEWS_API_KEY;
-
     try {
       setLoading(true);
-      setError(null);
-
-      const response = await fetch(
-        `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&sortBy=publishedAt&apiKey=${API_KEY}&pageSize=24`,
-        { headers: { Accept: "application/json" } }
-      );
-
+      const response = await fetch(`/api/news?query=${encodeURIComponent(query)}`);
+  
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to fetch news");
+        throw new Error(errorData.error || "Failed to fetch news");
       }
-
-      const data = await response.json();
-
-      // Process articles
-      const processedArticles = data.articles.map((article: any) => ({
-        ...article,
-        urlToImage: article.urlToImage || DEFAULT_FALLBACK_IMAGE,
-        publishedAt: article.publishedAt || new Date().toISOString(),
-      }));
-
-      setNews(processedArticles);
+  
+      const articles = await response.json();
+      setNews(articles);
     } catch (err: any) {
       setError(err.message || "Failed to fetch news");
     } finally {
       setLoading(false);
     }
   };
-
+  
   const fetchYouTubeVideos = async (
     query: string,
     pageToken: string | null = null
