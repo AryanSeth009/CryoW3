@@ -46,6 +46,21 @@ interface TwitterPost {
   created_at: string;
 }
 
+interface YouTubeVideo {
+  id: {
+    videoId: string;
+  };
+  snippet: {
+    title: string;
+    channelTitle: string;
+    thumbnails: {
+      medium: {
+        url: string;
+      };
+    };
+  };
+}
+
 const DEFAULT_FALLBACK_IMAGE = "https://cdn-icons-png.flaticon.com/512/4588/4588164.png";
 
 // Add new animation keyframes
@@ -85,7 +100,7 @@ export default function NewsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
   const itemsPerPage = 6;
-  const [youtubeVideos, setYoutubeVideos] = useState([]);
+  const [youtubeVideos, setYoutubeVideos] = useState<YouTubeVideo[]>([]);
   const [nextPageToken, setNextPageToken] = useState<string | null>(null);
   const [prevPageToken, setPrevPageToken] = useState<string | null>(null);
   const [redditNews, setRedditNews] = useState<NewsArticle[]>([]);
