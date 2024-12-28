@@ -154,18 +154,47 @@ export default function NewsPage() {
     try {
       setLoading(true);
       const response = await fetch(
-        `https://newsapi.org/v2/everything?q=${query}&sortBy=publishedAt&apiKey=${API_KEY}&pageSize=24`
+        `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&sortBy=publishedAt&apiKey=${API_KEY}&pageSize=24`,
+        {
+          headers: {
+            'X-Api-Key': API_KEY || '',
+            'Accept': 'application/json',
+            'User-Agent': 'CryoW3Times/1.0',
+          },
+          next: { revalidate: 300 }, // Cache for 5 minutes
+        }
       );
 
+      if (response.status === 426) {
+        throw new Error("API version upgrade required. Please check News API documentation.");
+      }
+
       if (!response.ok) {
-        throw new Error("Failed to fetch news");
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to fetch news");
       }
 
       const data = await response.json();
-      setNews(data.articles);
+      
+      if (!data.articles || !Array.isArray(data.articles)) {
+        throw new Error("Invalid response format from News API");
+      }
+
+      const processedArticles = data.articles.map(article => ({
+        ...article,
+        urlToImage: article.urlToImage || DEFAULT_FALLBACK_IMAGE,
+        publishedAt: article.publishedAt || new Date().toISOString(),
+        source: {
+          name: article.source?.name || 'Unknown Source',
+          icon: article.source?.icon || DEFAULT_FALLBACK_IMAGE
+        }
+      }));
+
+      setNews(processedArticles);
       setError(null);
     } catch (err) {
-      setError("Failed to fetch news. Please try again.");
+      console.error('News API Error:', err);
+      setError(err instanceof Error ? err.message : "Failed to fetch news. Please try again.");
     } finally {
       setLoading(false);
     }
