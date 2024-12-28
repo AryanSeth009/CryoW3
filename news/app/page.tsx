@@ -9,8 +9,8 @@ import { Input } from "@/components/ui/input";
 import {
   CryptoIcon,
   ChevronIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
+  // ChevronLeftIcon,
+  // ChevronRightIcon,
   SearchIcon,
   ArrowRightIcon,
   TimeIcon,
