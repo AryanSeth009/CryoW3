@@ -412,13 +412,15 @@ export default function NewsPage() {
               En <ChevronIcon className="ml-1 h-4 w-4" />
             </Button>
             <div className="relative w-[300px] flex items-center">
+              <div className="absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+              <SearchIcon className="h-4 w-4 text-gray-400" />
+              </div>
               <Input
-                prefix={<SearchIcon className="ml-2 h-4 w-4" />}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                placeholder="Enter a keyword..."
-                className="pl-10 h-10 rounded-full bg-[#1A1625] border border-transparent focus:border-[#8B5CF6] focus:ring-2 focus:ring-[#8B5CF6]/20 text-white placeholder:text-gray-400"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+              placeholder="Enter a keyword..."
+              className="pl-10 h-10 rounded-full bg-[#1A1625] border border-transparent focus:border-[#8B5CF6] focus:ring-2 focus:ring-[#8B5CF6]/20 text-white placeholder:text-gray-400"
               />
             </div>
           </div>
