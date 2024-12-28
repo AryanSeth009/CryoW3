@@ -387,7 +387,7 @@ export default function NewsPage() {
           <div className="hidden md:flex items-center space-x-8">
             <button
               onClick={() => handleNavbarSearch("cryptocurrency news")}
-              className="text-gray-300 font-sans hover:text-white font-normal font-sans transition-colors"
+              className="text-gray-300 font-sans hover:text-white font-medium font-sans transition-colors"
             >
               Crypto News
             </button>
@@ -419,7 +419,8 @@ export default function NewsPage() {
 
           <div className="flex items-center space-x-4">
             <div className="flex items-center gap-4">
-              <Button variant="ghost" size="icon" className="relative">
+             <div className="border border-white">
+             <Button variant="ghost" size="icon" className="relative border border-white ">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-5 w-5 text-gray-300"
@@ -428,10 +429,11 @@ export default function NewsPage() {
                 >
                   <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
                 </svg>
-                <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-[#8B5CF6] border-2 border-[#0D0B12] text-[10px] font-medium text-white flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full  text-[10px] font-medium text-white flex items-center justify-center">
                   3
                 </span>
               </Button>
+             </div>
               <Button variant="ghost" size="icon" className="h-8 w-8">
                 <Avatar>
                   <AvatarImage
