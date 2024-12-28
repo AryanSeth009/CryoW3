@@ -180,7 +180,7 @@ export default function NewsPage() {
         throw new Error("Invalid response format from News API");
       }
 
-      const processedArticles = data.articles.map(article => ({
+        const processedArticles = data.articles.map((article: NewsArticle) => ({
         ...article,
         urlToImage: article.urlToImage || DEFAULT_FALLBACK_IMAGE,
         publishedAt: article.publishedAt || new Date().toISOString(),
@@ -227,6 +227,25 @@ export default function NewsPage() {
     }
   };
 
+  interface RSSItem {
+    title: string;
+    description: string;
+    link: string;
+    thumbnail?: string;
+    enclosure?: {
+      link: string;
+    };
+    pubDate: string;
+  }
+
+  interface RSSFeed {
+    items: RSSItem[];
+    feed: {
+      title: string;
+      favicon?: string;
+    };
+  }
+
   const fetchRSSFeeds = async () => {
     try {
       setRssLoading(true);
@@ -244,8 +263,8 @@ export default function NewsPage() {
 
       const data = await Promise.all(responses.map(res => res.json()));
 
-      const transformedArticles = data.flatMap(feed =>
-        feed.items.map((item: any) => ({
+      const transformedArticles = data.flatMap((feed: RSSFeed) =>
+        feed.items.map((item: RSSItem) => ({
           title: item.title,
           description: item.description,
           url: item.link,
