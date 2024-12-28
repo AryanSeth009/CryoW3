@@ -153,21 +153,12 @@ export default function NewsPage() {
 
     try {
       setLoading(true);
+      setError(null);
+
       const response = await fetch(
         `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&sortBy=publishedAt&apiKey=${API_KEY}&pageSize=24`,
-        {
-          headers: {
-            'X-Api-Key': API_KEY || '',
-            'Accept': 'application/json',
-            'User-Agent': 'CryoW3Times/1.0',
-          },
-          next: { revalidate: 300 }, // Cache for 5 minutes
-        }
+        { headers: { Accept: "application/json" } }
       );
-
-      if (response.status === 426) {
-        throw new Error("API version upgrade required. Please check News API documentation.");
-      }
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -175,26 +166,17 @@ export default function NewsPage() {
       }
 
       const data = await response.json();
-      
-      if (!data.articles || !Array.isArray(data.articles)) {
-        throw new Error("Invalid response format from News API");
-      }
 
-        const processedArticles = data.articles.map((article: NewsArticle) => ({
+      // Process articles
+      const processedArticles = data.articles.map((article: any) => ({
         ...article,
         urlToImage: article.urlToImage || DEFAULT_FALLBACK_IMAGE,
         publishedAt: article.publishedAt || new Date().toISOString(),
-        source: {
-          name: article.source?.name || 'Unknown Source',
-          icon: article.source?.icon || DEFAULT_FALLBACK_IMAGE
-        }
       }));
 
       setNews(processedArticles);
-      setError(null);
-    } catch (err) {
-      console.error('News API Error:', err);
-      setError(err instanceof Error ? err.message : "Failed to fetch news. Please try again.");
+    } catch (err: any) {
+      setError(err.message || "Failed to fetch news");
     } finally {
       setLoading(false);
     }
@@ -438,8 +420,8 @@ export default function NewsPage() {
 
           <div className="flex items-center space-x-4">
             <div className="flex items-center gap-4">
-             <div className="border border-white">
-             <Button variant="ghost" size="icon" className="relative border border-white ">
+             <div className="">
+             <Button variant="ghost" size="icon" className="relative border border-white rounded-full ">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-5 w-5 text-gray-300"
@@ -448,7 +430,7 @@ export default function NewsPage() {
                 >
                   <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
                 </svg>
-                <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full  text-[10px] font-medium text-white flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 h-4 w-4 p-3 rounded-full  text-[10px] font-medium text-white flex items-center justify-center">
                   3
                 </span>
               </Button>
