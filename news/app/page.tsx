@@ -148,25 +148,58 @@ export default function NewsPage() {
     }
   };
 
-  const fetchNews = async (query: string) => {
-    try {
-      setLoading(true);
-      const response = await fetch(`/api/news?query=${encodeURIComponent(query)}`);
-  
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to fetch news");
-      }
-  
-      const articles = await response.json();
-      setNews(articles);
-    } catch (err: any) {
-      setError(err.message || "Failed to fetch news");
-    } finally {
-      setLoading(false);
-    }
-  };
-  
+  // const fetchNews = async (query: string) => {
+  //   const API_KEY = process.env.NEXT_PUBLIC_NEWS_API_KEY;
+
+  //   try {
+  //     setLoading(true);
+  //     const response = await fetch(
+  //       `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&sortBy=publishedAt&apiKey=${API_KEY}&pageSize=24`,
+  //       {
+  //         headers: {
+  //           'X-Api-Key': API_KEY || '',
+  //           'Accept': 'application/json',
+  //           'User-Agent': 'CryoW3Times/1.0',
+  //         },
+  //         next: { revalidate: 300 }, // Cache for 5 minutes
+  //       }
+  //     );
+
+  //     if (response.status === 426) {
+  //       throw new Error("API version upgrade required. Please check News API documentation.");
+  //     }
+
+  //     if (!response.ok) {
+  //       const errorData = await response.json();
+  //       throw new Error(errorData.message || "Failed to fetch news");
+  //     }
+
+  //     const data = await response.json();
+
+  //     if (!data.articles || !Array.isArray(data.articles)) {
+  //       throw new Error("Invalid response format from News API");
+  //     }
+
+  //     const processedArticles = data.articles.map((article: NewsArticle) => ({
+  //       ...article,
+  //       urlToImage: article.urlToImage || DEFAULT_FALLBACK_IMAGE,
+  //       publishedAt: article.publishedAt || new Date().toISOString(),
+  //       source: {
+  //         name: article.source?.name || 'Unknown Source',
+  //         icon: article.source?.icon || DEFAULT_FALLBACK_IMAGE
+  //       }
+  //     }));
+
+  //     setNews(processedArticles);
+  //     setError(null);
+  //   } catch (err) {
+  //     console.error('News API Error:', err);
+  //     setError(err instanceof Error ? err.message : "Failed to fetch news. Please try again.");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const fetchYouTubeVideos = async (
     query: string,
     pageToken: string | null = null
@@ -258,6 +291,52 @@ export default function NewsPage() {
       setRssLoading(false);
     }
   };
+  const fetchCurrentsNews = async () => {
+    try {
+      setRssLoading(true);
+      const apiKey = 'bvwzz-YoLk9Matt4f9rweH7BpWj7XlCfUK06czIuYCjFpLYs'; // Replace with your Currents API key
+      const endpoint = 'https://api.currentsapi.services/v1/latest-news';
+      const query = 'cryptocurrency'; // You can customize the search query
+      const count = 9; // Number of articles to fetch
+
+      const response = await fetch(`${endpoint}?category=${encodeURIComponent(query)}&language=en&apiKey=${apiKey}`);
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch news');
+      }
+
+      const data = await response.json();
+
+      const transformedArticles = data.news.map((item) => ({
+        title: item.title,
+        description: item.description,
+        url: item.url,
+        urlToImage: item.image || item.urlToImage,
+        source: {
+          name: item.source,
+          icon: item.icon, // If the source has an icon, you can use this
+        },
+        publishedAt: item.published,
+      }));
+
+      // Sort by date and take the latest 6 articles
+      const sortedArticles = transformedArticles
+        .sort(
+          (a, b) =>
+            new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+        )
+        .slice(0, count);
+
+      setRssNews(sortedArticles);
+      setError(null);
+    } catch (err) {
+      console.error("Currents API Error:", err);
+      setError("Failed to fetch news. Please try again.");
+    } finally {
+      setRssLoading(false);
+    }
+  };
+
 
   const fetchTwitterPosts = async (query: string, pageToken: string | null = null) => {
     try {
@@ -307,6 +386,7 @@ export default function NewsPage() {
 
   const handleNavbarSearch = (query: string) => {
     setSearchTerm(query);
+    fetchCurrentsNews(query)
     fetchNews(query);
     fetchYouTubeVideos(query);
     fetchRedditNews(null, query);
@@ -315,6 +395,7 @@ export default function NewsPage() {
 
   const handleSearch = () => {
     if (searchTerm.trim()) {
+      fetchCurrentsNews(searchTerm.trim());
       fetchNews(searchTerm.trim());
       fetchYouTubeVideos(searchTerm.trim());
       fetchRedditNews(null, searchTerm.trim());
@@ -356,7 +437,7 @@ export default function NewsPage() {
   }, []);
 
   return (
-    <div  style={{ fontFamily: "ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial" }} className="min-h-screen bg-gradient-to-br from-[#0D0B12] text-gray-100 animate-gradient-x">
+    <div style={{ fontFamily: "ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial" }} className="min-h-screen bg-gradient-to-br from-[#0D0B12] text-gray-100 animate-gradient-x">
       {/* Navigation */}
       <div className="fixed p-4  inset-0 z-0 select-none pointer-events-none">
         <div className="absolute top-0 right-0 w-full h-full">
@@ -405,21 +486,21 @@ export default function NewsPage() {
 
           <div className="flex items-center space-x-4">
             <div className="flex items-center gap-4">
-             <div className="">
-             <Button variant="ghost" size="icon" className="relative border border-white rounded-full ">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 text-gray-300"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
-                </svg>
-                <span className="absolute -top-1 -right-1 h-4 w-4 p-3 rounded-full  text-[10px] font-medium text-white flex items-center justify-center">
-                  3
-                </span>
-              </Button>
-             </div>
+              <div className="border border-white rounded-full">
+                <Button variant="ghost" size="icon" className="relative border rounded-full border-white ">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 text-gray-300"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
+                  </svg>
+                  <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full  text-[10px] font-medium text-white flex items-center justify-center">
+                    3
+                  </span>
+                </Button>
+              </div>
               <Button variant="ghost" size="icon" className="h-8 w-8">
                 <Avatar>
                   <AvatarImage
@@ -445,14 +526,14 @@ export default function NewsPage() {
             </Button>
             <div className="relative w-[300px] flex items-center">
               <div className="absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-              <SearchIcon className="h-4 w-4 text-gray-400" />
+                <SearchIcon className="h-4 w-4 text-gray-400" />
               </div>
               <Input
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-              placeholder="Enter a keyword..."
-              className="pl-10 h-10 rounded-full bg-[#1A1625] border border-transparent focus:border-[#8B5CF6] focus:ring-2 focus:ring-[#8B5CF6]/20 text-white placeholder:text-gray-400"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                placeholder="Enter a keyword..."
+                className="pl-10 h-10 rounded-full bg-[#1A1625] border border-transparent focus:border-[#8B5CF6] focus:ring-2 focus:ring-[#8B5CF6]/20 text-white placeholder:text-gray-400"
               />
             </div>
           </div>
@@ -579,28 +660,40 @@ export default function NewsPage() {
                                   <Image
                                     src={
                                       article.source.icon ||
-                                      "https://cdn-icons-png.flaticon.com/512/4588/4588164.png"
+                                      'https://cdn-icons-png.flaticon.com/512/4588/4588164.png'
                                     }
                                     alt="Author"
                                     width={24}
                                     height={24}
                                   />
                                 </Avatar>
-                                <span className="font-small">
-                                  {article.source.name}
-                                </span>
+                                <span className="font-small">{article.source.name}</span>
                               </div>
                               <span>•</span>
                               <div className="flex items-center gap-2 opacity-60">
-                                <span className="">
-                                  12 hours ago
-                                </span>
+                                <span>12 hours ago</span>
                               </div>
                             </div>
                           </div>
                         </Card>
                       </Link>
                     ))}
+                  </div>
+                  <div className="flex justify-center gap-4 mt-6">
+                    <button
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={currentPage === 1}
+                      className="px-4 py-2 bg-[#8B5CF6] text-white rounded-lg disabled:bg-gray-400"
+                    >
+                      Previous
+                    </button>
+                    <button
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={currentPage * 9 >= totalArticles}
+                      className="px-4 py-2 bg-[#8B5CF6] text-white rounded-lg disabled:bg-gray-400"
+                    >
+                      Next
+                    </button>
                   </div>
                 </section>
                 {/* YouTube Videos */}
@@ -948,7 +1041,7 @@ export default function NewsPage() {
           <Newsletter />
           <Footer onTagClick={function (tag: string): void {
             throw new Error("Function not implemented.");
-          } }/>
+          }} />
         </div>
       </main>
 
