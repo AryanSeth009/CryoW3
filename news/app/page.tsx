@@ -271,7 +271,7 @@ export default function NewsPage() {
   //   }
   // };
 
-  const fetchYouTubeVideos = async (query: string = "cryptocurrency news") => {
+  const fetchYouTubeVideos = async (queryWithPageToken: string = "cryptocurrency news") => {
     try {
       const API_KEY = process.env.NEXT_PUBLIC_YOUTUBE_API_KEY;
       if (!API_KEY) {
@@ -280,9 +280,28 @@ export default function NewsPage() {
         return;
       }
 
-      const response = await fetch(
-        `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=9&q=${encodeURIComponent(query)}&type=video&key=${API_KEY}`
-      );
+      // Split the query to handle search term and page token
+      const [query, pageToken] = queryWithPageToken.split(' ').reduce((acc, part) => {
+        if (/^[A-Za-z0-9_-]{3,}$/.test(part)) {
+          acc[1] = part;
+        } else {
+          acc[0] = acc[0] ? `${acc[0]} ${part}` : part;
+        }
+        return acc;
+      }, ['', null]);
+
+      const url = new URL('https://www.googleapis.com/youtube/v3/search');
+      url.searchParams.set('part', 'snippet');
+      url.searchParams.set('maxResults', '9');
+      url.searchParams.set('q', encodeURIComponent(query || "cryptocurrency news"));
+      url.searchParams.set('type', 'video');
+      url.searchParams.set('key', API_KEY);
+      
+      if (pageToken) {
+        url.searchParams.set('pageToken', pageToken);
+      }
+
+      const response = await fetch(url.toString());
 
       if (!response.ok) {
         console.warn(`YouTube API request failed with status: ${response.status}`);
@@ -312,6 +331,10 @@ export default function NewsPage() {
         },
         url: `https://www.youtube.com/watch?v=${item.id.videoId}`
       }));
+
+      // Update page tokens
+      setNextPageToken(data.nextPageToken || null);
+      setPrevPageToken(data.prevPageToken || null);
 
       setYoutubeVideos(videos);
     } catch (error) {
@@ -430,7 +453,6 @@ export default function NewsPage() {
   //     setRssLoading(false);
   //   }
   // };
-
 
   const fetchTwitterPosts = async (query: string, pageToken: string | null = null) => {
     try {
@@ -733,7 +755,7 @@ export default function NewsPage() {
                         rel="noopener noreferrer"
                         className="group"
                       >
-                        <Card className="bg-[#0A0B0F]/60 backdrop-blur-xl border-white/10 rounded-xl hover:rounded-2xl hover:border-[#8B5CF6]/50 transition-all duration-300">
+                        <Card className="bg-[#0A0B0F]/60 backdrop-blur-xl border-white/10 rounded-xl hover:rounded-2xl hover:border-[#8B5CF6]/50 border hover:rounded-2xl hover:border-purple-500/50 rounded-xl transition-all duration-300">
                           <div className="relative h-48 rounded-t-xl overflow-hidden">
                             <Image
                               src={article.urlToImage || DEFAULT_FALLBACK_IMAGE}
@@ -805,7 +827,7 @@ export default function NewsPage() {
                         disabled={!prevPageToken}
                         onClick={() =>
                           prevPageToken &&
-                          fetchYouTubeVideos(searchTerm || "cryptocurrency", prevPageToken)
+                          fetchYouTubeVideos(`${searchTerm || "cryptocurrency"} ${prevPageToken}`)
                         }
                         className="h-8 w-8 rounded-full border-gray-800"
                       >
@@ -817,7 +839,7 @@ export default function NewsPage() {
                         disabled={!nextPageToken}
                         onClick={() =>
                           nextPageToken &&
-                          fetchYouTubeVideos(searchTerm || "cryptocurrency", nextPageToken)
+                          fetchYouTubeVideos(`${searchTerm || "cryptocurrency"} ${nextPageToken}`)
                         }
                         className="h-8 w-8 rounded-full border-gray-800"
                       >
@@ -938,7 +960,7 @@ export default function NewsPage() {
                         rel="noopener noreferrer"
                         className="group"
                       >
-                        <Card className="bg-[#0A0B0F]/60 backdrop-blur-xl border-white/10 rounded-xl hover:rounded-2xl hover:border-[#8B5CF6]/50  hover:rounded-2xl hover:border-purple-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/10 transform hover:-translate-y-1">
+                        <Card className="bg-[#0A0B0F]/60 backdrop-blur-xl border-white/10 rounded-xl hover:rounded-2xl hover:border-[#8B5CF6]/50 hover:border-purple-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/10 transform hover:-translate-y-1">
                           <div className="relative h-48 rounded-t-xl overflow-hidden">
                             <Image
                               src={article.urlToImage || DEFAULT_FALLBACK_IMAGE}
@@ -971,7 +993,7 @@ export default function NewsPage() {
                               </div>
                               <span>•</span>
                               <div className="flex items-center gap-2 opacity-60">
-                                <span className="">
+                                <span>
                                   12 hours ago
                                 </span>
                               </div>
@@ -1235,4 +1257,3 @@ export default function NewsPage() {
     </div>
   );
 }
-
