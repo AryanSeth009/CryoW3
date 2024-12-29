@@ -153,61 +153,61 @@ export default function NewsPage() {
   const [gNewsCurrentPage, setGNewsCurrentPage] = useState(1);
   const gNewsItemsPerPage = 3;
 
-  const fetchGNews = async (query: string = "cryptocurrency") => {
-    try {
-      setGNewsLoading(true);
-      const API_KEY = process.env.NEXT_PUBLIC_GNEWS_API_KEY;
-      if (!API_KEY) {
-        throw new Error("GNews API key is not configured");
-      }
+  // const fetchGNews = async (query: string = "cryptocurrency") => {
+  //   try {
+  //     setGNewsLoading(true);
+  //     const API_KEY = process.env.NEXT_PUBLIC_GNEWS_API_KEY;
+  //     if (!API_KEY) {
+  //       throw new Error("GNews API key is not configured");
+  //     }
 
-      console.log("Fetching GNews with API key:", API_KEY.substring(0, 5) + '...');
-      console.log("Query:", query);
+  //     console.log("Fetching GNews with API key:", API_KEY.substring(0, 5) + '...');
+  //     console.log("Query:", query);
 
-      const url = `https://gnews.io/api/v4/search?q=${encodeURIComponent(query)}&lang=en&country=us&max=9&apikey=${API_KEY}`;
-      console.log("Fetch URL:", url);
+  //     const url = `https://gnews.io/api/v4/search?q=${encodeURIComponent(query)}&lang=en&country=us&max=9&apikey=${API_KEY}`;
+  //     console.log("Fetch URL:", url);
 
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-        }
-      });
+  //     const response = await fetch(url, {
+  //       method: 'GET',
+  //       headers: {
+  //         'Accept': 'application/json',
+  //       }
+  //     });
 
-      console.log("Response status:", response.status);
-      console.log("Response headers:", Object.fromEntries(response.headers.entries()));
+  //     console.log("Response status:", response.status);
+  //     console.log("Response headers:", Object.fromEntries(response.headers.entries()));
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Error response text:", errorText);
-        throw new Error(`Failed to fetch GNews. Status: ${response.status}, ${errorText}`);
-      }
+  //     if (!response.ok) {
+  //       const errorText = await response.text();
+  //       console.error("Error response text:", errorText);
+  //       throw new Error(`Failed to fetch GNews. Status: ${response.status}, ${errorText}`);
+  //     }
 
-      const data = await response.json();
-      console.log("Received data:", data);
+  //     const data = await response.json();
+  //     console.log("Received data:", data);
 
-      const gNewsArticles = data.articles.map((article: any) => ({
-        title: article.title,
-        description: article.description,
-        url: article.url,
-        urlToImage: article.image || DEFAULT_FALLBACK_IMAGE,
-        source: {
-          name: article.source.name || 'GNews',
-          icon: undefined
-        },
-        publishedAt: article.publishedAt || new Date().toISOString()
-      }));
+  //     const gNewsArticles = data.articles.map((article: any) => ({
+  //       title: article.title,
+  //       description: article.description,
+  //       url: article.url,
+  //       urlToImage: article.image || DEFAULT_FALLBACK_IMAGE,
+  //       source: {
+  //         name: article.source.name || 'GNews',
+  //         icon: undefined
+  //       },
+  //       publishedAt: article.publishedAt || new Date().toISOString()
+  //     }));
 
-      setGNews(gNewsArticles);
-      setGNewsError(null);
-    } catch (err) {
-      console.error("Detailed GNews Error:", err);
-      setGNewsError(err instanceof Error ? err.message : "An unknown error occurred");
-      setGNews([]);
-    } finally {
-      setGNewsLoading(false);
-    }
-  };
+  //     setGNews(gNewsArticles);
+  //     setGNewsError(null);
+  //   } catch (err) {
+  //     console.error("Detailed GNews Error:", err);
+  //     setGNewsError(err instanceof Error ? err.message : "An unknown error occurred");
+  //     setGNews([]);
+  //   } finally {
+  //     setGNewsLoading(false);
+  //   }
+  // };
 
   const handleGNewsPageChange = (newPage: number) => {
     if (newPage > 0 && newPage <= Math.ceil(gNews.length / gNewsItemsPerPage)) {
@@ -215,9 +215,7 @@ export default function NewsPage() {
     }
   };
 
-  useEffect(() => {
-    fetchGNews();
-  }, []);
+ 
 
   // const fetchNews = async (query: string) => {
   //   const API_KEY = process.env.NEXT_PUBLIC_NEWS_API_KEY;
@@ -281,7 +279,7 @@ export default function NewsPage() {
       }
 
       // Split the query to handle search term and page token
-      const [query, pageToken] = queryWithPageToken.split(' ').reduce((acc, part) => {
+      const [query, pageToken] = queryWithPageToken.split(' ').reduce<[string, string | null]>((acc, part) => {
         if (/^[A-Za-z0-9_-]{3,}$/.test(part)) {
           acc[1] = part;
         } else {
@@ -296,7 +294,7 @@ export default function NewsPage() {
       url.searchParams.set('q', encodeURIComponent(query || "cryptocurrency news"));
       url.searchParams.set('type', 'video');
       url.searchParams.set('key', API_KEY);
-      
+
       if (pageToken) {
         url.searchParams.set('pageToken', pageToken);
       }
@@ -454,51 +452,51 @@ export default function NewsPage() {
   //   }
   // };
 
-  const fetchTwitterPosts = async (query: string, pageToken: string | null = null) => {
-    try {
-      setLoading(true);
+  // const fetchTwitterPosts = async (query: string, pageToken: string | null = null) => {
+  //   try {
+  //     setLoading(true);
 
-      const url = `https://twitter-api45.p.rapidapi.com/usermedia.php?screenname=${encodeURIComponent(query)}${pageToken ? `&pagination_token=${encodeURIComponent(pageToken)}` : ""}`;
+  //     const url = `https://twitter-api45.p.rapidapi.com/usermedia.php?screenname=${encodeURIComponent(query)}${pageToken ? `&pagination_token=${encodeURIComponent(pageToken)}` : ""}`;
 
-      const response = await fetch(url, {
-        method: "GET",
-        headers: {
-          "X-RapidAPI-Key": "7760b52a34mshe145977f1ea47fep190b18jsn60ad0f119d3",
-          "X-RapidAPI-Host": "twitter-api45.p.rapidapi.com",
-        },
-      });
+  //     const response = await fetch(url, {
+  //       method: "GET",
+  //       headers: {
+  //         "X-RapidAPI-Key": "7760b52a34mshe145977f1ea47fep190b18jsn60ad0f119d3",
+  //         "X-RapidAPI-Host": "twitter-api45.p.rapidapi.com",
+  //       },
+  //     });
 
-      if (!response.ok) {
-        throw new Error(`Failed to fetch Twitter posts: ${response.status}`);
-      }
+  //     if (!response.ok) {
+  //       throw new Error(`Failed to fetch Twitter posts: ${response.status}`);
+  //     }
 
-      const data = await response.json();
+  //     const data = await response.json();
 
-      // Transform the API response to match our TwitterPost interface
-      const transformedPosts = data?.map((tweet: any) => ({
-        id: tweet.id_str || tweet.id,
-        text: tweet.text || tweet.full_text,
-        user: {
-          name: tweet.user.name,
-          screen_name: tweet.user.screen_name,
-          profile_image_url: tweet.user.profile_image_url_https || tweet.user.profile_image_url,
-        },
-        created_at: tweet.created_at,
-      })) || [];
+  //     // Transform the API response to match our TwitterPost interface
+  //     const transformedPosts = data?.map((tweet: any) => ({
+  //       id: tweet.id_str || tweet.id,
+  //       text: tweet.text || tweet.full_text,
+  //       user: {
+  //         name: tweet.user.name,
+  //         screen_name: tweet.user.screen_name,
+  //         profile_image_url: tweet.user.profile_image_url_https || tweet.user.profile_image_url,
+  //       },
+  //       created_at: tweet.created_at,
+  //     })) || [];
 
-      setTwitterPosts(transformedPosts);
+  //     setTwitterPosts(transformedPosts);
 
-      // Update pagination tokens if available in the response
-      setNextTwitterPageToken(data.pagination_token || null);
-      setPrevTwitterPageToken(null); // This endpoint might not support previous page
-      setError(null);
-    } catch (err) {
-      console.error('Twitter API Error:', err);
-      setError("Failed to fetch Twitter posts. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  //     // Update pagination tokens if available in the response
+  //     setNextTwitterPageToken(data.pagination_token || null);
+  //     setPrevTwitterPageToken(null); // This endpoint might not support previous page
+  //     setError(null);
+  //   } catch (err) {
+  //     console.error('Twitter API Error:', err);
+  //     setError("Failed to fetch Twitter posts. Please try again.");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const handleNavbarSearch = (query: string) => {
     setSearchTerm(query);
@@ -513,10 +511,11 @@ export default function NewsPage() {
   const handleSearch = () => {
     if (searchTerm.trim()) {
       // fetchCurrentsNews(searchTerm.trim());
-      // fetchNews(searchTerm.trim());
-      fetchYouTubeVideos(searchTerm.trim());
+      // // fetchNews(searchTerm.trim());
+      // fetchYouTubeVideos(searchTerm.trim());
       fetchRedditNews(null, searchTerm.trim());
-      fetchTwitterPosts("elonmusk"); // Keep showing Elon's tweets regardless of search
+      fetchRSSFeeds();
+      // fetchTwitterPosts("elonmusk"); // Keep showing Elon's tweets regardless of search
     }
   };
 
@@ -532,24 +531,24 @@ export default function NewsPage() {
     }
   };
 
-  const handleNextTwitterPage = () => {
-    if (nextTwitterPageToken) {
-      fetchTwitterPosts(searchTerm, nextTwitterPageToken);
-    }
-  };
+  // const handleNextTwitterPage = () => {
+  //   if (nextTwitterPageToken) {
+  //     fetchTwitterPosts(searchTerm, nextTwitterPageToken);
+  //   }
+  // };
 
-  const handlePrevTwitterPage = () => {
-    if (prevTwitterPageToken) {
-      fetchTwitterPosts(searchTerm, prevTwitterPageToken);
-    }
-  };
+  // const handlePrevTwitterPage = () => {
+  //   if (prevTwitterPageToken) {
+  //     fetchTwitterPosts(searchTerm, prevTwitterPageToken);
+  //   }
+  // };
 
   useEffect(() => {
     const defaultQuery = "cryptocurrency news";
     setSearchTerm(defaultQuery);
-    fetchGNews(defaultQuery);
-    // fetchNews(defaultQuery);
-    fetchYouTubeVideos(defaultQuery);
+    // fetchGNews(defaultQuery);
+    // // fetchNews(defaultQuery);
+    // fetchYouTubeVideos(defaultQuery);
     fetchRedditNews(null, defaultQuery);
     fetchRSSFeeds();
   }, []);
@@ -815,7 +814,7 @@ export default function NewsPage() {
                   </div>
                 </section> */}
                 {/* YouTube Videos */}
-                <section className="mb-12 flex flex-col">
+                {/* <section className="mb-12 flex flex-col">
                   <div className="flex mb-4">
                     <h2 className="text-4xl w-full font-normal font-sans flex items-center justify-between">
                       YouTube Videos
@@ -879,7 +878,7 @@ export default function NewsPage() {
                       </div>
                     ))}
                   </div>
-                </section>
+                </section> */}
 
                 {/* Reddit Section */}
                 <section className="mb-12 flex flex-col ">
@@ -945,7 +944,7 @@ export default function NewsPage() {
                 </section>
 
                 {/* RSS News Section */}
-                <section className="mb-12 flex flex-col">
+                <section className="mb-12 flex flex-col absolute">
                   <div className="flex mb-4">
                     <h2 className="text-4xl w-full font-normal font-sans flex items-center justify-between">
                       Crypto News Feeds
@@ -1005,95 +1004,95 @@ export default function NewsPage() {
                   </div>
                 </section>
                 {/* GNews Section */}
-                <section className="mb-12 flex flex-col">
-  <div className="flex mb-4">
-    <h2 className="text-4xl w-full font-normal font-sans flex items-center justify-between">
-      GNews Cryptocurrency
-    </h2>
-  </div>
-  {gNewsLoading ? (
-    <div className="flex justify-center items-center">
-      <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-purple-500"></div>
-    </div>
-  ) : gNewsError ? (
-    <div className="text-red-500 text-center">{gNewsError}</div>
-  ) : (
-    <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-3">
-      {gNews
-        .slice(
-          (gNewsCurrentPage - 1) * gNewsItemsPerPage,
-          gNewsCurrentPage * gNewsItemsPerPage
-        )
-        .map((article, index) => (
-          <Link
-            key={index}
-            href={article.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group"
-          >
-            <Card className="bg-[#0A0B0F]/60 backdrop-blur-xl border-white/10 rounded-xl hover:rounded-2xl hover:border-[#8B5CF6]/50 hover:border-purple-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/10 transform hover:-translate-y-1">
-              <div className="relative h-48 rounded-t-xl overflow-hidden">
-                <Image
-                  src={article.urlToImage || DEFAULT_FALLBACK_IMAGE}
-                  alt={article.title}
-                  fill
-                  className="object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#231d30] via-transparent opacity-50" />
-                <Badge className="absolute top-4 left-4 bg-purple-500/90 hover:bg-purple-600">
-                  {article.source.name}
-                </Badge>
-              </div>
-              <div className="p-4">
-                <h3 className="font-semibold text-md leading-tight group-hover:text-purple-500 transition-colors line-clamp-2 mb-3">
-                  {article.title}
-                </h3>
-                <p className="text-sm text-gray-400 line-clamp-3 mb-4">
-                  {article.description}
-                </p>
-                <div className="flex items-center gap-4 text-sm text-gray-400">
-                  <div className="flex items-center gap-2">
-                    <Avatar className="h-6 w-6 border-2 border-purple-500/30">
-                      <Image
-                        src={article.source.icon || DEFAULT_FALLBACK_IMAGE}
-                        alt="Source"
-                        width={24}
-                        height={24}
-                      />
-                    </Avatar>
-                    <span className="font-small">{article.source.name}</span>
+                {/* <section className="mb-12 flex flex-col">
+                  <div className="flex mb-4">
+                    <h2 className="text-4xl w-full font-normal font-sans flex items-center justify-between">
+                      GNews Cryptocurrency
+                    </h2>
                   </div>
-                  <span>•</span>
-                  <div className="flex items-center gap-2 opacity-60">
-                    <span>
-                      {new Date(article.publishedAt).toLocaleDateString()}
-                    </span>
+                  {gNewsLoading ? (
+                    <div className="flex justify-center items-center">
+                      <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-purple-500"></div>
+                    </div>
+                  ) : gNewsError ? (
+                    <div className="text-red-500 text-center">{gNewsError}</div>
+                  ) : (
+                    <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-3">
+                      {gNews
+                        .slice(
+                          (gNewsCurrentPage - 1) * gNewsItemsPerPage,
+                          gNewsCurrentPage * gNewsItemsPerPage
+                        )
+                        .map((article, index) => (
+                          <Link
+                            key={index}
+                            href={article.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="group"
+                          >
+                            <Card className="bg-[#0A0B0F]/60 backdrop-blur-xl border-white/10 rounded-xl hover:rounded-2xl hover:border-[#8B5CF6]/50 hover:border-purple-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/10 transform hover:-translate-y-1">
+                              <div className="relative h-48 rounded-t-xl overflow-hidden">
+                                <Image
+                                  src={article.urlToImage || DEFAULT_FALLBACK_IMAGE}
+                                  alt={article.title}
+                                  fill
+                                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-[#231d30] via-transparent opacity-50" />
+                                <Badge className="absolute top-4 left-4 bg-purple-500/90 hover:bg-purple-600">
+                                  {article.source.name}
+                                </Badge>
+                              </div>
+                              <div className="p-4">
+                                <h3 className="font-semibold text-md leading-tight group-hover:text-purple-500 transition-colors line-clamp-2 mb-3">
+                                  {article.title}
+                                </h3>
+                                <p className="text-sm text-gray-400 line-clamp-3 mb-4">
+                                  {article.description}
+                                </p>
+                                <div className="flex items-center gap-4 text-sm text-gray-400">
+                                  <div className="flex items-center gap-2">
+                                    <Avatar className="h-6 w-6 border-2 border-purple-500/30">
+                                      <Image
+                                        src={article.source.icon || DEFAULT_FALLBACK_IMAGE}
+                                        alt="Source"
+                                        width={24}
+                                        height={24}
+                                      />
+                                    </Avatar>
+                                    <span className="font-small">{article.source.name}</span>
+                                  </div>
+                                  <span>•</span>
+                                  <div className="flex items-center gap-2 opacity-60">
+                                    <span>
+                                      {new Date(article.publishedAt).toLocaleDateString()}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            </Card>
+                          </Link>
+                        ))}
+                    </div>
+                  )}
+                  <div className="flex justify-center gap-4 mt-6">
+                    <button
+                      onClick={() => handleGNewsPageChange(gNewsCurrentPage - 1)}
+                      disabled={gNewsCurrentPage === 1}
+                      className="px-4 py-2 bg-purple-500 text-white rounded-lg disabled:bg-gray-400"
+                    >
+                      Previous
+                    </button>
+                    <button
+                      onClick={() => handleGNewsPageChange(gNewsCurrentPage + 1)}
+                      disabled={gNewsCurrentPage * gNewsItemsPerPage >= gNews.length}
+                      className="px-4 py-2 bg-purple-500 text-white rounded-lg disabled:bg-gray-400"
+                    >
+                      Next
+                    </button>
                   </div>
-                </div>
-              </div>
-            </Card>
-          </Link>
-        ))}
-    </div>
-  )}
-  <div className="flex justify-center gap-4 mt-6">
-    <button
-      onClick={() => handleGNewsPageChange(gNewsCurrentPage - 1)}
-      disabled={gNewsCurrentPage === 1}
-      className="px-4 py-2 bg-purple-500 text-white rounded-lg disabled:bg-gray-400"
-    >
-      Previous
-    </button>
-    <button
-      onClick={() => handleGNewsPageChange(gNewsCurrentPage + 1)}
-      disabled={gNewsCurrentPage * gNewsItemsPerPage >= gNews.length}
-      className="px-4 py-2 bg-purple-500 text-white rounded-lg disabled:bg-gray-400"
-    >
-      Next
-    </button>
-  </div>
-</section>
+                </section> */}
 
 
                 {/* Twitter Section */}
