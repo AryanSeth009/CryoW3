@@ -192,41 +192,20 @@ export default function NewsPage() {
         throw new Error("GNews API key is not configured");
       }
 
-      console.log(
-        "Fetching GNews with API key:",
-        API_KEY.substring(0, 5) + "..."
-      );
-      console.log("Query:", query);
-
       const url = `https://gnews.io/api/v4/search?q=${encodeURIComponent(
         query
       )}&lang=en&country=us&max=9&apikey=${API_KEY}`;
-      console.log("Fetch URL:", url);
-
-      const response = await fetch(url, {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-        },
-      });
-
-      console.log("Response status:", response.status);
-      console.log(
-        "Response headers:",
-        Object.fromEntries(response.headers.entries())
-      );
+      const response = await fetch(url);
 
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Error response text:", errorText);
-        throw new Error(
-          `Failed to fetch GNews. Status: ${response.status}, ${errorText}`
+        console.error(
+          `GNews API request failed with status: ${response.status}`
         );
+        setGNewsError("Failed to fetch GNews. Please try again.");
+        return;
       }
 
       const data = await response.json();
-      console.log("Received data:", data);
-
       const gNewsArticles = data.articles.map((article: any) => ({
         title: article.title,
         description: article.description,
@@ -322,31 +301,31 @@ export default function NewsPage() {
   //   }
   // };
 
-  const fetchYouTubeVideos = async (
-    query: string,
-    pageToken: string | null = null
-  ) => {
+  const fetchYouTubeVideos = async (query: string) => {
     try {
-      setLoading(true);
+      setYoutubeLoading(true);
       const response = await fetch(
-        `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${query}&type=video&maxResults=9&order=date&key=${YOUTUBE_API_KEY}${
-          pageToken ? `&pageToken=${pageToken}` : ""
-        }`
+        `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=9&q=${encodeURIComponent(
+          query
+        )}&type=video&key=${YOUTUBE_API_KEY}`
       );
 
       if (!response.ok) {
-        throw new Error("Failed to fetch YouTube videos");
+        console.error(
+          `YouTube API request failed with status: ${response.status}`
+        );
+        setYoutubeError("Failed to fetch YouTube videos. Please try again.");
+        return;
       }
 
       const data = await response.json();
       setYoutubeVideos(data.items);
-      setNextPageToken(data.nextPageToken || null);
-      setPrevPageToken(data.prevPageToken || null);
-      setError(null);
-    } catch (err) {
-      setError("Failed to fetch YouTube videos. Please try again.");
+      setYoutubeError(null);
+    } catch (error) {
+      console.error("Error fetching YouTube videos:", error);
+      setYoutubeError("Failed to fetch YouTube videos. Please try again.");
     } finally {
-      setLoading(false);
+      setYoutubeLoading(false);
     }
   };
 
@@ -713,7 +692,7 @@ export default function NewsPage() {
       <main className="container mx-auto p-8 px-4 py-4">
         <div className="grid p-8 lg:grid-cols-[1fr_400px] gap-12">
           <div>
-            {loading || rssLoading ? (
+            {loading ? (
               <LoadingSkeleton />
             ) : error ? (
               <div className="bg-red-900/20 border border-red-800 p-4 rounded-xl">
@@ -795,123 +774,129 @@ export default function NewsPage() {
                     </div>
 
                     {/* YouTube Videos */}
-                    <section className="mb-12 flex flex-col">
-                      <div className="flex mb-4">
-                        <h2 className="text-4xl w-full font-normal font-sans flex items-center justify-between">
-                          YouTube Videos
-                        </h2>
-                        <div className="flex gap-2 mb-4 items-end justify-end">
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            disabled={!prevPageToken}
-                            onClick={() =>
-                              prevPageToken &&
-                              fetchYouTubeVideos(
-                                `${
-                                  searchTerm || "cryptocurrency"
-                                } ${prevPageToken}`
-                              )
-                            }
-                            className="h-8 w-8 rounded-full border-gray-800"
-                          >
-                            <ArrowRightIcon className="rotate-180" />
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            disabled={!nextPageToken}
-                            onClick={() =>
-                              nextPageToken &&
-                              fetchYouTubeVideos(
-                                `${
-                                  searchTerm || "cryptocurrency"
-                                } ${nextPageToken}`
-                              )
-                            }
-                            className="h-8 w-8 rounded-full border-gray-800"
-                          >
-                            <ArrowRightIcon />
-                          </Button>
-                        </div>
+                    {youtubeLoading ? (
+                      <LoadingSkeleton />
+                    ) : youtubeError ? (
+                      <div className="text-red-500 text-center">
+                        {youtubeError}
                       </div>
-                      <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-3">
-                        {youtubeVideos.slice(0, 9).map((video) => (
-                          <div
-                            key={video.id.videoId}
-                            className="bg-[#0A0B0F]/60 backdrop-blur-xl border-white/10 rounded-xl hover:rounded-2xl hover:border-[#8B5CF6]/50  border hover:rounded-2xl hover:border-blue-500/50 rounded-xl transition-all duration-300"
-                          >
-                            <div className="relative rounded-2xl hover:rounded-2xl hover:border-purple-500">
-                              <img
-                                src={video.snippet.thumbnails.medium.url}
-                                alt={video.snippet.title}
-                                className="w-full h-48 rounded-t-2xl object-cover"
-                              />
-                              <div className="p-4 space-y-2">
-                                <h3 className="text-md font-medium line-clamp-2">
-                                  {video.snippet.title}
-                                </h3>
-                                <p className="text-sm text-gray-400">
-                                  {video.snippet.channelTitle}
-                                </p>
-                                <a
-                                  href={`https://www.youtube.com/watch?v=${video.id.videoId}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-blue-400 hover:underline"
-                                >
-                                  Watch on YouTube
-                                </a>
+                    ) : (
+                      <section className="mb-12 flex flex-col">
+                        <div className="flex mb-4">
+                          <h2 className="text-4xl w-full font-normal font-sans flex items-center justify-between">
+                            YouTube Videos
+                          </h2>
+                          <div className="flex gap-2 mb-4 items-end justify-end">
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              disabled={!prevPageToken}
+                              onClick={() =>
+                                prevPageToken &&
+                                fetchYouTubeVideos(
+                                  `${
+                                    searchTerm || "cryptocurrency"
+                                  } ${prevPageToken}`
+                                )
+                              }
+                              className="h-8 w-8 rounded-full border-gray-800"
+                            >
+                              <ArrowRightIcon className="rotate-180" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              disabled={!nextPageToken}
+                              onClick={() =>
+                                nextPageToken &&
+                                fetchYouTubeVideos(
+                                  `${
+                                    searchTerm || "cryptocurrency"
+                                  } ${nextPageToken}`
+                                )
+                              }
+                              className="h-8 w-8 rounded-full border-gray-800"
+                            >
+                              <ArrowRightIcon />
+                            </Button>
+                          </div>
+                        </div>
+                        <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-3">
+                          {youtubeVideos.slice(0, 9).map((video) => (
+                            <div
+                              key={video.id.videoId}
+                              className="bg-[#0A0B0F]/60 backdrop-blur-xl border-white/10 rounded-xl hover:rounded-2xl hover:border-[#8B5CF6]/50  border hover:rounded-2xl hover:border-blue-500/50 rounded-xl transition-all duration-300"
+                            >
+                              <div className="relative rounded-2xl hover:rounded-2xl hover:border-purple-500">
+                                <img
+                                  src={video.snippet.thumbnails.medium.url}
+                                  alt={video.snippet.title}
+                                  className="w-full h-48 rounded-t-2xl object-cover"
+                                />
+                                <div className="p-4 space-y-2">
+                                  <h3 className="text-md font-medium line-clamp-2">
+                                    {video.snippet.title}
+                                  </h3>
+                                  <p className="text-sm text-gray-400">
+                                    {video.snippet.channelTitle}
+                                  </p>
+                                  <a
+                                    href={`https://www.youtube.com/watch?v=${video.id.videoId}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-blue-400 hover:underline"
+                                  >
+                                    Watch on YouTube
+                                  </a>
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        ))}
-                      </div>
-                    </section>
+                          ))}
+                        </div>
+                      </section>
+                    )}
 
                     {/* Gnews Section*/}
-                    <section className="mb-12 flex flex-col">
-                      <div className="flex mb-4">
-                        <h2 className="text-4xl w-full font-normal font-sans flex items-center justify-between">
-                          GNews Cryptocurrency
-                        </h2>
-                        <div className="flex gap-2 mb-4 items-end justify-end">
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            disabled={gNewsCurrentPage === 1}
-                            onClick={() =>
-                              handleGNewsPageChange(gNewsCurrentPage - 1)
-                            }
-                            className="h-8 w-8 rounded-full border-gray-800"
-                          >
-                            <ArrowRightIcon className="rotate-180" />
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            disabled={
-                              gNewsCurrentPage * gNewsItemsPerPage >=
-                              gNews.length
-                            }
-                            onClick={() =>
-                              handleGNewsPageChange(gNewsCurrentPage + 1)
-                            }
-                            className="h-8 w-8 rounded-full border-gray-800"
-                          >
-                            <ArrowRightIcon />
-                          </Button>
-                        </div>
+                    {gNewsLoading ? (
+                      <LoadingSkeleton />
+                    ) : gNewsError ? (
+                      <div className="text-red-500 text-center">
+                        {gNewsError}
                       </div>
-                      {gNewsLoading ? (
-                        <div className="flex justify-center items-center">
-                          <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-purple-500"></div>
+                    ) : (
+                      <section className="mb-12 flex flex-col">
+                        <div className="flex mb-4">
+                          <h2 className="text-4xl w-full font-normal font-sans flex items-center justify-between">
+                            GNews Cryptocurrency
+                          </h2>
+                          <div className="flex gap-2 mb-4 items-end justify-end">
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              disabled={gNewsCurrentPage === 1}
+                              onClick={() =>
+                                handleGNewsPageChange(gNewsCurrentPage - 1)
+                              }
+                              className="h-8 w-8 rounded-full border-gray-800"
+                            >
+                              <ArrowRightIcon className="rotate-180" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              disabled={
+                                gNewsCurrentPage * gNewsItemsPerPage >=
+                                gNews.length
+                              }
+                              onClick={() =>
+                                handleGNewsPageChange(gNewsCurrentPage + 1)
+                              }
+                              className="h-8 w-8 rounded-full border-gray-800"
+                            >
+                              <ArrowRightIcon />
+                            </Button>
+                          </div>
                         </div>
-                      ) : gNewsError ? (
-                        <div className="text-red-500 text-center">
-                          {gNewsError}
-                        </div>
-                      ) : (
                         <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-3">
                           {gNews
                             .slice(
@@ -980,30 +965,8 @@ export default function NewsPage() {
                               </Link>
                             ))}
                         </div>
-                      )}
-                      {/* <div className="flex justify-center gap-4 mt-6">
-                        <button
-                          onClick={() =>
-                            handleGNewsPageChange(gNewsCurrentPage - 1)
-                          }
-                          disabled={gNewsCurrentPage === 1}
-                          className="px-4 py-2 bg-purple-500 text-white rounded-lg disabled:bg-gray-400"
-                        >
-                          Previous
-                        </button>
-                        <button
-                          onClick={() =>
-                            handleGNewsPageChange(gNewsCurrentPage + 1)
-                          }
-                          disabled={
-                            gNewsCurrentPage * gNewsItemsPerPage >= gNews.length
-                          }
-                          className="px-4 py-2 bg-purple-500 text-white rounded-lg disabled:bg-gray-400"
-                        >
-                          Next
-                        </button>
-                      </div> */}
-                    </section>
+                      </section>
+                    )}
 
                     {/* Reddit Section */}
                     <section className="mb-12 flex flex-col ">
