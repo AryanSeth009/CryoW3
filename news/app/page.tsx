@@ -322,7 +322,7 @@ export default function NewsPage() {
         console.error(
           `YouTube API request failed with status: ${response.status}`
         );
-        setYoutubeError("Failed to fetch YouTube videos. Please try again.");
+        setYoutubeError("");
         return;
       }
 
@@ -663,15 +663,15 @@ export default function NewsPage() {
         `https://newsapi.org/v2/everything?q=${query}&sortBy=publishedAt&apiKey=${API_KEY}&pageSize=24`
       );
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch news");
-      }
+      // if (!response.ok) {
+      //   throw new Error("Failed to fetch news");
+      // }
 
       const data = await response.json();
       setNews(data.articles);
       setError(null);
     } catch (err) {
-      setError("Failed to fetch news. Please try again.");
+      // setError("Failed to fetch news. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -888,7 +888,7 @@ export default function NewsPage() {
                               className="bg-[#0A0B0F]/60 backdrop-blur-xl border-white/10 rounded-xl hover:rounded-2xl hover:border-[#8B5CF6]/50  border hover:rounded-2xl hover:border-blue-500/50 rounded-xl transition-all duration-300"
                             >
                               <div className="relative rounded-2xl hover:rounded-2xl hover:border-purple-500">
-                                <img
+                                <Image
                                   src={video.snippet.thumbnails.medium.url}
                                   alt={video.snippet.title}
                                   className="w-full h-48 rounded-t-2xl object-cover"
@@ -1322,7 +1322,7 @@ export default function NewsPage() {
               {[
                 ...rssNews.slice(6, 9),
                 ...redditNews.slice(6, 9),
-               
+
                 ...newsData.slice(0, 4),
               ].map((article, index) => (
                 <Link
