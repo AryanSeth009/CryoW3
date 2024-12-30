@@ -598,28 +598,28 @@ export default function NewsPage() {
     );
   };
 
-  // const fetchNews = async (query: string) => {
-  //   const API_KEY = process.env.NEXT_PUBLIC_NEWS_API_KEY;
+  const fetchNews = async (query: string) => {
+    const API_KEY = process.env.NEXT_PUBLIC_NEWS_API_KEY;
 
-  //   try {
-  //     setLoading(true);
-  //     const response = await fetch(
-  //       `https://newsapi.org/v2/everything?q=${query}&sortBy=publishedAt&apiKey=${API_KEY}&pageSize=24`
-  //     );
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `https://newsapi.org/v2/everything?q=${query}&sortBy=publishedAt&apiKey=${API_KEY}&pageSize=24`
+      );
 
-  //     if (!response.ok) {
-  //       throw new Error("Failed to fetch news");
-  //     }
+      if (!response.ok) {
+        throw new Error("Failed to fetch news");
+      }
 
-  //     const data = await response.json();
-  //     setNews(data.articles);
-  //     setError(null);
-  //   } catch (err) {
-  //     setError("Failed to fetch news. Please try again.");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+      const data = await response.json();
+      setNews(data.articles);
+      setError(null);
+    } catch (err) {
+      setError("Failed to fetch news. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div
@@ -715,7 +715,7 @@ export default function NewsPage() {
                       <Badge className="bg-[#2c2a3a] text-purple-500 mb-4 uppercase tracking-wider font-medium">
                         BEST OF THE WEEK
                       </Badge>
-                      {news[0] && (
+                      {rssNews[0] && (
                         <div className="grid md:grid-cols-2 gap-8 items-center">
                           <div className="space-y-4">
                             <div className="flex items-center gap-2 text-sm text-gray-400">
@@ -728,7 +728,7 @@ export default function NewsPage() {
                               <span>12 hours ago</span>
                             </div>
                             <h1 className="text-3xl font-bold leading-tight">
-                              {news[0].title}
+                              {rssNews[0].title}
                             </h1>
                             <div className="flex gap-2">
                               <Badge
@@ -761,9 +761,9 @@ export default function NewsPage() {
                             <div className="relative w-full h-[300px] rounded-3xl overflow-hidden">
                               <Image
                                 src={
-                                  news[0].urlToImage || DEFAULT_FALLBACK_IMAGE
+                                  rssNews[0].urlToImage || DEFAULT_FALLBACK_IMAGE
                                 }
-                                alt={news[0].title}
+                                alt={rssNews[0].title}
                                 fill
                                 className="object-cover transition-transform duration-700 group-hover:scale-105"
                               />
@@ -1113,7 +1113,7 @@ export default function NewsPage() {
               <h2 className="text-4xl font-normal font-sans">Recommended</h2>
             </div>
             <div className="space-y-6">
-              {news.slice(4, 5).map((article, index) => (
+              {rssNews.slice(4, 5).map((article, index) => (
                 <Link
                   key={index}
                   href={article.url}
@@ -1148,7 +1148,7 @@ export default function NewsPage() {
                 </Link>
               ))}
 
-              {news.slice(5, 48).map((article, index) => (
+              {rssNews.slice(5, 10).map((article, index) => (
                 <Link
                   key={index}
                   href={article.url}
