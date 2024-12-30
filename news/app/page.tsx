@@ -818,7 +818,11 @@ export default function NewsPage() {
                             <div className="relative w-full h-[300px] rounded-3xl overflow-hidden">
                               <Image
                                 src={
-                                  rssNews[0].urlToImage || DEFAULT_FALLBACK_IMAGE
+                                  rssNews[0].urlToImage &&
+                                  (rssNews[0].urlToImage.startsWith("http") ||
+                                    rssNews[0].urlToImage.startsWith("/"))
+                                    ? rssNews[0].urlToImage
+                                    : DEFAULT_FALLBACK_IMAGE
                                 }
                                 alt={rssNews[0].title}
                                 fill
@@ -972,8 +976,13 @@ export default function NewsPage() {
                                   <div className="relative h-48 rounded-t-xl overflow-hidden">
                                     <Image
                                       src={
-                                        article.urlToImage ||
-                                        DEFAULT_FALLBACK_IMAGE
+                                        article.urlToImage &&
+                                        (article.urlToImage.startsWith(
+                                          "http"
+                                        ) ||
+                                          article.urlToImage.startsWith("/"))
+                                          ? article.urlToImage
+                                          : DEFAULT_FALLBACK_IMAGE
                                       }
                                       alt={article.title}
                                       fill
@@ -1063,7 +1072,8 @@ export default function NewsPage() {
                                 <Image
                                   src={
                                     article.urlToImage &&
-                                    article.urlToImage.startsWith("http")
+                                    (article.urlToImage.startsWith("http") ||
+                                      article.urlToImage.startsWith("/"))
                                       ? article.urlToImage
                                       : DEFAULT_FALLBACK_IMAGE
                                   }
@@ -1117,7 +1127,11 @@ export default function NewsPage() {
                               <div className="relative h-48 rounded-t-xl overflow-hidden">
                                 <Image
                                   src={
-                                    article.urlToImage || DEFAULT_FALLBACK_IMAGE
+                                    article.urlToImage &&
+                                    (article.urlToImage.startsWith("http") ||
+                                      article.urlToImage.startsWith("/"))
+                                      ? article.urlToImage
+                                      : DEFAULT_FALLBACK_IMAGE
                                   }
                                   alt={article.title}
                                   fill
@@ -1305,7 +1319,13 @@ export default function NewsPage() {
                 </Link>
               ))}
 
-              {rssNews.slice(5, 9).map((article, index) => (
+              {/* New mixed news section */}
+              {[
+                ...rssNews.slice(6, 9),
+                ...redditNews.slice(6,9 ),
+                ...gNews.slice(0, 4),
+                ...newsData.slice(0, 4),
+              ].map((article, index) => (
                 <Link
                   key={index}
                   href={article.url}
@@ -1313,10 +1333,16 @@ export default function NewsPage() {
                   rel="noopener noreferrer"
                   className="group block"
                 >
-                  <Card className="flex gap-5 bg-[#0A0B0F]/60 backdrop-blur-xl border-white/10 rounded-xl hover:rounded-2xl hover:border-[#8B5CF6]/50  transition-all duration-300">
+                  <Card className="flex gap-5 bg-[#0A0B0F]/60 backdrop-blur-xl border-white/10 rounded-xl hover:rounded-2xl hover:border-[#8B5CF6]/50 transition-all duration-300">
                     <div className="relative w-[100px] h-[100px]">
                       <Image
-                        src={article.urlToImage || DEFAULT_FALLBACK_IMAGE}
+                        src={
+                          article.urlToImage &&
+                          (article.urlToImage.startsWith("http") ||
+                            article.urlToImage.startsWith("/"))
+                            ? article.urlToImage
+                            : DEFAULT_FALLBACK_IMAGE
+                        }
                         alt={article.title}
                         fill
                         className="rounded-xl object-cover"
@@ -1331,7 +1357,7 @@ export default function NewsPage() {
                           variant="outline"
                           className="text-purple-500 border-purple-500/30 bg-purple-500/5"
                         >
-                          {article.source.name}
+                          {article.source?.name || "Unknown Source"}
                         </Badge>
                         <div className="flex items-center gap-2 opacity-60">
                           <span>12 hours ago</span>
