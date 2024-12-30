@@ -278,28 +278,26 @@ export default function NewsPage() {
     }
   };
 
-  // const fetchNews = async (query: string) => {
-  //   const API_KEY = process.env.NEXT_PUBLIC_NEWS_API_KEY;
+  const fetchNews = async (query: string) => {
+    const API_KEY = process.env.NEXT_PUBLIC_NEWS_API_KEY;
 
-  //   try {
-  //     setLoading(true);
-  //     const response = await fetch(
-  //       `https://newsapi.org/v2/everything?q=${query}&sortBy=publishedAt&apiKey=${API_KEY}&pageSize=24`
-  //     );
+    try {
+      setLoading(false);
+      const response = await fetch(
+        `https://newsapi.org/v2/everything?q=${query}&sortBy=publishedAt&apiKey=${API_KEY}&pageSize=24`
+      );
 
-  //     if (!response.ok) {
-  //       throw new Error("Failed to fetch news");
-  //     }
+      if (!response.ok) {
+        throw new Error("Failed to fetch news");
+      }
 
-  //     const data = await response.json();
-  //     setNews(data.articles);
-  //     setError(null);
-  //   } catch (err) {
-  //     setError("Failed to fetch news. Please try again.");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+      const data = await response.json();
+      setNews(data.articles);
+      setError(null);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchYouTubeVideos = async (query: string) => {
     try {
@@ -441,7 +439,7 @@ export default function NewsPage() {
 
   const handleNavbarSearch = (query: string) => {
     setSearchTerm(query);
-    fetchNews(query);
+    // fetchNews(query);
     fetchYouTubeVideos(query);
     fetchRedditNews(null, query);
     fetchRSSFeeds(); // Keep RSS feeds as they are crypto-specific already
@@ -449,7 +447,7 @@ export default function NewsPage() {
 
   const handleSearch = () => {
     if (searchTerm.trim()) {
-      fetchNews(searchTerm.trim());
+      // fetchNews(searchTerm.trim());
       fetchYouTubeVideos(searchTerm.trim());
       fetchRedditNews(null, searchTerm.trim());
       fetchTwitterPosts("elonmusk"); // Keep showing Elon's tweets regardless of search
@@ -598,29 +596,6 @@ export default function NewsPage() {
     );
   };
 
-  const fetchNews = async (query: string) => {
-    const API_KEY = process.env.NEXT_PUBLIC_NEWS_API_KEY;
-
-    try {
-      setLoading(true);
-      const response = await fetch(
-        `https://newsapi.org/v2/everything?q=${query}&sortBy=publishedAt&apiKey=${API_KEY}&pageSize=24`
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch news");
-      }
-
-      const data = await response.json();
-      setNews(data.articles);
-      setError(null);
-    } catch (err) {
-      setError("Failed to fetch news. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <div
       style={{
@@ -761,7 +736,8 @@ export default function NewsPage() {
                             <div className="relative w-full h-[300px] rounded-3xl overflow-hidden">
                               <Image
                                 src={
-                                  rssNews[0].urlToImage || DEFAULT_FALLBACK_IMAGE
+                                  rssNews[0].urlToImage ||
+                                  DEFAULT_FALLBACK_IMAGE
                                 }
                                 alt={rssNews[0].title}
                                 fill
