@@ -9,8 +9,8 @@ import { Input } from "@/components/ui/input";
 import {
   CryptoIcon,
   ChevronIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
+  // ChevronLeftIcon,
+  // ChevronRightIcon,
   SearchIcon,
   ArrowRightIcon,
   TimeIcon,
@@ -84,7 +84,16 @@ export default function NewsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
   const itemsPerPage = 6;
-  const [youtubeVideos, setYoutubeVideos] = useState([]);
+  const [youtubeVideos, setYoutubeVideos] = useState<
+    {
+      id: { videoId: string };
+      snippet: {
+        thumbnails: { medium: { url: string } };
+        title: string;
+        channelTitle: string;
+      };
+    }[]
+  >([]);
   const [nextPageToken, setNextPageToken] = useState<string | null>(null);
   const [prevPageToken, setPrevPageToken] = useState<string | null>(null);
   const [redditNews, setRedditNews] = useState<NewsArticle[]>([]);
@@ -904,7 +913,11 @@ export default function NewsPage() {
                               </div>
                               <span>•</span>
                               <div className="flex items-center gap-2 opacity-60">
-                                <span>12 hours ago</span>
+                                <span>
+                                  {new Date(
+                                    article.publishedAt
+                                  ).toLocaleDateString()}
+                                </span>
                               </div>
                             </div>
                           </div>
