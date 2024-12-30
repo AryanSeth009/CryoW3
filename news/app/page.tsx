@@ -184,60 +184,52 @@ export default function NewsPage() {
   const [youtubeLoading, setYoutubeLoading] = useState(true);
   const [youtubeError, setYoutubeError] = useState<string | null>(null);
 
-  // Add state variables for NewsData.io
-  const [newsData, setNewsData] = useState<NewsArticle[]>([]);
-  const [newsDataLoading, setNewsDataLoading] = useState(true);
-  const [newsDataError, setNewsDataError] = useState<string | null>(null);
+  const fetchGNews = async (query: string = "cryptocurrency") => {
+    try {
+      setGNewsLoading(true);
+      const API_KEY = process.env.NEXT_PUBLIC_GNEWS_API_KEY;
+      if (!API_KEY) {
+        throw new Error("GNews API key is not configured");
+      }
 
-  // Add state variables for pagination
-  const [newsDataCurrentPage, setNewsDataCurrentPage] = useState(1);
-  const newsDataItemsPerPage = 9; // Number of items to display per page
+      const url = `https://gnews.io/api/v4/search?q=${encodeURIComponent(
+        query
+      )}&lang=en&country=us&max=9&apikey=${API_KEY}`;
+      const response = await fetch(url);
 
-  // const fetchGNews = async (query: string = "cryptocurrency") => {
-  //   try {
-  //     setGNewsLoading(true);
-  //     const API_KEY = process.env.NEXT_PUBLIC_GNEWS_API_KEY;
-  //     if (!API_KEY) {
-  //       throw new Error("GNews API key is not configured");
-  //     }
+      if (!response.ok) {
+        console.error(
+          `GNews API request failed with status: ${response.status}`
+        );
+        setGNewsError("Failed to fetch GNews. Please try again.");
+        return;
+      }
 
-  //     const url = `https://gnews.io/api/v4/search?q=${encodeURIComponent(
-  //       query
-  //     )}&lang=en&country=us&max=9&apikey=${API_KEY}`;
-  //     const response = await fetch(url);
+      const data = await response.json();
+      const gNewsArticles = data.articles.map((article: any) => ({
+        title: article.title,
+        description: article.description,
+        url: article.url,
+        urlToImage: article.image || DEFAULT_FALLBACK_IMAGE,
+        source: {
+          name: article.source.name || "GNews",
+          icon: undefined,
+        },
+        publishedAt: article.publishedAt || new Date().toISOString(),
+      }));
 
-  //     if (!response.ok) {
-  //       const errorData = await response.json();
-  //       console.error(`GNews API request failed: ${errorData.message}`);
-  //       setGNewsError("Failed to fetch GNews. Please try again.");
-  //       return;
-  //     }
-
-  //     const data = await response.json();
-  //     const gNewsArticles = data.articles.map((article: any) => ({
-  //       title: article.title,
-  //       description: article.description,
-  //       url: article.url,
-  //       urlToImage: article.image || DEFAULT_FALLBACK_IMAGE,
-  //       source: {
-  //         name: article.source.name || "GNews",
-  //         icon: undefined,
-  //       },
-  //       publishedAt: article.publishedAt || new Date().toISOString(),
-  //     }));
-
-  //     setGNews(gNewsArticles);
-  //     setGNewsError(null);
-  //   } catch (err) {
-  //     console.error("Detailed GNews Error:", err);
-  //     setGNewsError(
-  //       err instanceof Error ? err.message : "An unknown error occurred"
-  //     );
-  //     setGNews([]);
-  //   } finally {
-  //     setGNewsLoading(false);
-  //   }
-  // };
+      setGNews(gNewsArticles);
+      setGNewsError(null);
+    } catch (err) {
+      console.error("Detailed GNews Error:", err);
+      setGNewsError(
+        err instanceof Error ? err.message : "An unknown error occurred"
+      );
+      setGNews([]);
+    } finally {
+      setGNewsLoading(false);
+    }
+  };
 
   const handleGNewsPageChange = (newPage: number) => {
     if (newPage > 0 && newPage <= Math.ceil(gNews.length / gNewsItemsPerPage)) {
@@ -320,10 +312,9 @@ export default function NewsPage() {
 
       if (!response.ok) {
         console.error(
-          `YouTube API request failed with status
-          : ${response.status}`
+          `YouTube API request failed with status: ${response.status}`
         );
-        setYoutubeError("");
+        setYoutubeError("Failed to fetch YouTube videos. Please try again.");
         return;
       }
 
@@ -489,63 +480,15 @@ export default function NewsPage() {
     }
   };
 
-  // Fetch NewsData.io articles with pagination
-  const fetchNewsData = async (
-    query: string = "cryptocurrency",
-    page: number = 1
-  ) => {
-    try {
-      setNewsDataLoading(true);
-      const API_KEY = process.env.NEXT_PUBLIC_NEWS_DATA_API_KEY;
-      const url = `https://newsdata.io/api/1/news?apikey=${API_KEY}&q=${encodeURIComponent(
-        query
-      )}&page=${page}&size=${newsDataItemsPerPage}`;
-
-      console.log("Fetching URL:", url); // Log the URL
-
-      const response = await fetch(url);
-
-      if (!response.ok) {
-        console.error(
-          `NewsData.io API request failed with status: ${response.status}`
-        );
-        setNewsDataError(
-          "Failed to fetch news from NewsData.io. Please try again."
-        );
-        return;
-      }
-
-      const data = await response.json();
-      setNewsData(data.results);
-      setNewsDataError(null);
-    } catch (error) {
-      console.error("Error fetching NewsData.io articles:", error);
-      setNewsDataError(
-        "Failed to fetch news from NewsData.io. Please try again."
-      );
-    } finally {
-      setNewsDataLoading(false);
-    }
-  };
-
-  // Function to handle page change
-  const handleNewsDataPageChange = (newPage: number) => {
-    if (newPage > 0) {
-      setNewsDataCurrentPage(newPage);
-      fetchNewsData(searchTerm, newPage); // Fetch news data for the new page
-    }
-  };
-
   useEffect(() => {
     const defaultQuery = "cryptocurrency news";
     setSearchTerm(defaultQuery);
-    // fetchGNews(defaultQuery);
-    // fetchNews(defaultQuery);
+    fetchGNews(defaultQuery);
+    fetchNews(defaultQuery);
     fetchYouTubeVideos(defaultQuery);
     fetchRedditNews(null, defaultQuery);
     fetchRSSFeeds();
-    fetchNewsData(defaultQuery, newsDataCurrentPage); // Fetch NewsData.io articles
-  }, [searchTerm, newsDataCurrentPage]);
+  }, []);
 
   const LoadingSkeleton = () => (
     <div className="space-y-8 animate-pulse">
@@ -655,28 +598,28 @@ export default function NewsPage() {
     );
   };
 
-  // const fetchNews = async (query: string) => {
-  //   const API_KEY = process.env.NEXT_PUBLIC_NEWS_API_KEY;
+  const fetchNews = async (query: string) => {
+    const API_KEY = process.env.NEXT_PUBLIC_NEWS_API_KEY;
 
-  //   try {
-  //     setLoading(true);
-  //     const response = await fetch(
-  //       `https://newsapi.org/v2/everything?q=${query}&sortBy=publishedAt&apiKey=${API_KEY}&pageSize=24`
-  //     );
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `https://newsapi.org/v2/everything?q=${query}&sortBy=publishedAt&apiKey=${API_KEY}&pageSize=24`
+      );
 
-  //     // if (!response.ok) {
-  //     //   throw new Error("Failed to fetch news");
-  //     // }
+      if (!response.ok) {
+        throw new Error("Failed to fetch news");
+      }
 
-  //     const data = await response.json();
-  //     setNews(data.articles);
-  //     setError(null);
-  //   } catch (err) {
-  //     // setError("Failed to fetch news. Please try again.");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+      const data = await response.json();
+      setNews(data.articles);
+      setError(null);
+    } catch (err) {
+      setError("Failed to fetch news. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div
@@ -818,13 +761,9 @@ export default function NewsPage() {
                             <div className="relative w-full h-[300px] rounded-3xl overflow-hidden">
                               <Image
                                 src={
-                                  rssNews[0].urlToImage &&
-                                  (rssNews[0].urlToImage.startsWith("http") ||
-                                    rssNews[0].urlToImage.startsWith("/"))
-                                    ? rssNews[0].urlToImage
-                                    : DEFAULT_FALLBACK_IMAGE
+                                  news[0].urlToImage || DEFAULT_FALLBACK_IMAGE
                                 }
-                                alt={rssNews[0].title}
+                                alt={news[0].title}
                                 fill
                                 className="object-cover transition-transform duration-700 group-hover:scale-105"
                               />
@@ -889,7 +828,7 @@ export default function NewsPage() {
                               className="bg-[#0A0B0F]/60 backdrop-blur-xl border-white/10 rounded-xl hover:rounded-2xl hover:border-[#8B5CF6]/50  border hover:rounded-2xl hover:border-blue-500/50 rounded-xl transition-all duration-300"
                             >
                               <div className="relative rounded-2xl hover:rounded-2xl hover:border-purple-500">
-                                <Image
+                                <img
                                   src={video.snippet.thumbnails.medium.url}
                                   alt={video.snippet.title}
                                   className="w-full h-48 rounded-t-2xl object-cover"
@@ -918,7 +857,7 @@ export default function NewsPage() {
                     )}
 
                     {/* Gnews Section*/}
-                    {/* {gNewsLoading ? (
+                    {gNewsLoading ? (
                       <LoadingSkeleton />
                     ) : gNewsError ? (
                       <div className="text-red-500 text-center">
@@ -976,13 +915,8 @@ export default function NewsPage() {
                                   <div className="relative h-48 rounded-t-xl overflow-hidden">
                                     <Image
                                       src={
-                                        article.urlToImage &&
-                                        (article.urlToImage.startsWith(
-                                          "http"
-                                        ) ||
-                                          article.urlToImage.startsWith("/"))
-                                          ? article.urlToImage
-                                          : DEFAULT_FALLBACK_IMAGE
+                                        article.urlToImage ||
+                                        DEFAULT_FALLBACK_IMAGE
                                       }
                                       alt={article.title}
                                       fill
@@ -1032,7 +966,7 @@ export default function NewsPage() {
                             ))}
                         </div>
                       </section>
-                    )} */}
+                    )}
 
                     {/* Reddit Section */}
                     <section className="mb-12 flex flex-col ">
@@ -1072,8 +1006,7 @@ export default function NewsPage() {
                                 <Image
                                   src={
                                     article.urlToImage &&
-                                    (article.urlToImage.startsWith("http") ||
-                                      article.urlToImage.startsWith("/"))
+                                    article.urlToImage.startsWith("http")
                                       ? article.urlToImage
                                       : DEFAULT_FALLBACK_IMAGE
                                   }
@@ -1127,11 +1060,7 @@ export default function NewsPage() {
                               <div className="relative h-48 rounded-t-xl overflow-hidden">
                                 <Image
                                   src={
-                                    article.urlToImage &&
-                                    (article.urlToImage.startsWith("http") ||
-                                      article.urlToImage.startsWith("/"))
-                                      ? article.urlToImage
-                                      : DEFAULT_FALLBACK_IMAGE
+                                    article.urlToImage || DEFAULT_FALLBACK_IMAGE
                                   }
                                   alt={article.title}
                                   fill
@@ -1171,106 +1100,6 @@ export default function NewsPage() {
                         ))}
                       </div>
                     </section>
-
-                    {/* NewsData.io Section */}
-                    {newsDataLoading ? (
-                      <LoadingSkeleton />
-                    ) : newsDataError ? (
-                      <div className="text-red-500 text-center">
-                        {newsDataError}
-                      </div>
-                    ) : (
-                      <section className="mb-12 flex flex-col">
-                        <h2 className="text-4xl w-full font-normal font-sans flex items-center justify-between">
-                          NewsData.io Cryptocurrency
-                        </h2>
-                        <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-3">
-                          {newsData.map((article, index) => (
-                            <Link
-                              key={index}
-                              href={article.url || "#"}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="group"
-                            >
-                              <Card className="bg-[#0A0B0F]/60 backdrop-blur-xl border-white/10 rounded-xl hover:rounded-2xl hover:border-[#8B5CF6]/50 hover:border-purple-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/10 transform hover:-translate-y-1">
-                                <div className="relative h-48 rounded-t-xl overflow-hidden">
-                                  <Image
-                                    src={
-                                      article.image || DEFAULT_FALLBACK_IMAGE
-                                    }
-                                    alt={article.title}
-                                    fill
-                                    className="object-cover transition-transform duration-700 group-hover:scale-105"
-                                  />
-                                  <div className="absolute inset-0 bg-gradient-to-t from-[#231d30] via-transparent opacity-50" />
-                                  <Badge className="absolute top-4 left-4 bg-purple-500/90 hover:bg-purple-600">
-                                    {article.source?.name || "Unknown Source"}
-                                  </Badge>
-                                </div>
-                                <div className="p-4">
-                                  <h3 className="font-semibold text-md leading-tight group-hover:text-purple-500 transition-colors line-clamp-2 mb-3">
-                                    {article.title}
-                                  </h3>
-                                  <p className="text-sm text-gray-400 line-clamp-3 mb-4">
-                                    {article.description}
-                                  </p>
-                                  <div className="flex items-center gap-4 text-sm text-gray-400">
-                                    <div className="flex items-center gap-2">
-                                      <Avatar className="h-6 w-6 border-2 border-purple-500/30">
-                                        <Image
-                                          src={
-                                            article.source?.icon ||
-                                            DEFAULT_FALLBACK_IMAGE
-                                          }
-                                          alt="Source"
-                                          width={24}
-                                          height={24}
-                                        />
-                                      </Avatar>
-                                      <span className="font-small">
-                                        {article.source?.name ||
-                                          "Unknown Source"}
-                                      </span>
-                                    </div>
-                                    <span>•</span>
-                                    <div className="flex items-center gap-2 opacity-60">
-                                      <span>
-                                        {new Date(
-                                          article.publishedAt
-                                        ).toLocaleDateString()}
-                                      </span>
-                                    </div>
-                                  </div>
-                                </div>
-                              </Card>
-                            </Link>
-                          ))}
-                        </div>
-
-                        {/* Pagination Controls */}
-                        <div className="flex justify-center gap-4 mt-6">
-                          <Button
-                            onClick={() =>
-                              handleNewsDataPageChange(newsDataCurrentPage - 1)
-                            }
-                            disabled={newsDataCurrentPage === 1}
-                            className="px-4 py-2 bg-purple-500 text-white rounded-lg disabled:bg-gray-400"
-                          >
-                            Previous
-                          </Button>
-                          <Button
-                            onClick={() =>
-                              handleNewsDataPageChange(newsDataCurrentPage + 1)
-                            }
-                            disabled={newsData.length < newsDataItemsPerPage}
-                            className="px-4 py-2 bg-purple-500 text-white rounded-lg disabled:bg-gray-400"
-                          >
-                            Next
-                          </Button>
-                        </div>
-                      </section>
-                    )}
                   </>
                 )}
               </>
@@ -1284,7 +1113,7 @@ export default function NewsPage() {
               <h2 className="text-4xl font-normal font-sans">Recommended</h2>
             </div>
             <div className="space-y-6">
-              {rssNews.slice(4, 5).map((article, index) => (
+              {news.slice(4, 5).map((article, index) => (
                 <Link
                   key={index}
                   href={article.url}
@@ -1319,13 +1148,7 @@ export default function NewsPage() {
                 </Link>
               ))}
 
-              {/* New mixed news section */}
-              {[
-                ...rssNews.slice(6, 9),
-                ...redditNews.slice(6, 9),
-
-                ...newsData.slice(0, 4),
-              ].map((article, index) => (
+              {news.slice(5, 48).map((article, index) => (
                 <Link
                   key={index}
                   href={article.url}
@@ -1333,16 +1156,10 @@ export default function NewsPage() {
                   rel="noopener noreferrer"
                   className="group block"
                 >
-                  <Card className="flex gap-5 bg-[#0A0B0F]/60 backdrop-blur-xl border-white/10 rounded-xl hover:rounded-2xl hover:border-[#8B5CF6]/50 transition-all duration-300">
+                  <Card className="flex gap-5 bg-[#0A0B0F]/60 backdrop-blur-xl border-white/10 rounded-xl hover:rounded-2xl hover:border-[#8B5CF6]/50  transition-all duration-300">
                     <div className="relative w-[100px] h-[100px]">
                       <Image
-                        src={
-                          article.urlToImage &&
-                          (article.urlToImage.startsWith("http") ||
-                            article.urlToImage.startsWith("/"))
-                            ? article.urlToImage
-                            : DEFAULT_FALLBACK_IMAGE
-                        }
+                        src={article.urlToImage || DEFAULT_FALLBACK_IMAGE}
                         alt={article.title}
                         fill
                         className="rounded-xl object-cover"
@@ -1357,7 +1174,7 @@ export default function NewsPage() {
                           variant="outline"
                           className="text-purple-500 border-purple-500/30 bg-purple-500/5"
                         >
-                          {article.source?.name || "Unknown Source"}
+                          {article.source.name}
                         </Badge>
                         <div className="flex items-center gap-2 opacity-60">
                           <span>12 hours ago</span>
