@@ -193,51 +193,51 @@ export default function NewsPage() {
   const [newsDataCurrentPage, setNewsDataCurrentPage] = useState(1);
   const newsDataItemsPerPage = 9; // Number of items to display per page
 
-  const fetchGNews = async (query: string = "cryptocurrency") => {
-    try {
-      setGNewsLoading(true);
-      const API_KEY = process.env.NEXT_PUBLIC_GNEWS_API_KEY;
-      if (!API_KEY) {
-        throw new Error("GNews API key is not configured");
-      }
+  // const fetchGNews = async (query: string = "cryptocurrency") => {
+  //   try {
+  //     setGNewsLoading(true);
+  //     const API_KEY = process.env.NEXT_PUBLIC_GNEWS_API_KEY;
+  //     if (!API_KEY) {
+  //       throw new Error("GNews API key is not configured");
+  //     }
 
-      const url = `https://gnews.io/api/v4/search?q=${encodeURIComponent(
-        query
-      )}&lang=en&country=us&max=9&apikey=${API_KEY}`;
-      const response = await fetch(url);
+  //     const url = `https://gnews.io/api/v4/search?q=${encodeURIComponent(
+  //       query
+  //     )}&lang=en&country=us&max=9&apikey=${API_KEY}`;
+  //     const response = await fetch(url);
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error(`GNews API request failed: ${errorData.message}`);
-        setGNewsError("Failed to fetch GNews. Please try again.");
-        return;
-      }
+  //     if (!response.ok) {
+  //       const errorData = await response.json();
+  //       console.error(`GNews API request failed: ${errorData.message}`);
+  //       setGNewsError("Failed to fetch GNews. Please try again.");
+  //       return;
+  //     }
 
-      const data = await response.json();
-      const gNewsArticles = data.articles.map((article: any) => ({
-        title: article.title,
-        description: article.description,
-        url: article.url,
-        urlToImage: article.image || DEFAULT_FALLBACK_IMAGE,
-        source: {
-          name: article.source.name || "GNews",
-          icon: undefined,
-        },
-        publishedAt: article.publishedAt || new Date().toISOString(),
-      }));
+  //     const data = await response.json();
+  //     const gNewsArticles = data.articles.map((article: any) => ({
+  //       title: article.title,
+  //       description: article.description,
+  //       url: article.url,
+  //       urlToImage: article.image || DEFAULT_FALLBACK_IMAGE,
+  //       source: {
+  //         name: article.source.name || "GNews",
+  //         icon: undefined,
+  //       },
+  //       publishedAt: article.publishedAt || new Date().toISOString(),
+  //     }));
 
-      setGNews(gNewsArticles);
-      setGNewsError(null);
-    } catch (err) {
-      console.error("Detailed GNews Error:", err);
-      setGNewsError(
-        err instanceof Error ? err.message : "An unknown error occurred"
-      );
-      setGNews([]);
-    } finally {
-      setGNewsLoading(false);
-    }
-  };
+  //     setGNews(gNewsArticles);
+  //     setGNewsError(null);
+  //   } catch (err) {
+  //     console.error("Detailed GNews Error:", err);
+  //     setGNewsError(
+  //       err instanceof Error ? err.message : "An unknown error occurred"
+  //     );
+  //     setGNews([]);
+  //   } finally {
+  //     setGNewsLoading(false);
+  //   }
+  // };
 
   const handleGNewsPageChange = (newPage: number) => {
     if (newPage > 0 && newPage <= Math.ceil(gNews.length / gNewsItemsPerPage)) {
@@ -539,8 +539,8 @@ export default function NewsPage() {
   useEffect(() => {
     const defaultQuery = "cryptocurrency news";
     setSearchTerm(defaultQuery);
-    fetchGNews(defaultQuery);
-    fetchNews(defaultQuery);
+    // fetchGNews(defaultQuery);
+    // fetchNews(defaultQuery);
     fetchYouTubeVideos(defaultQuery);
     fetchRedditNews(null, defaultQuery);
     fetchRSSFeeds();
@@ -655,28 +655,28 @@ export default function NewsPage() {
     );
   };
 
-  const fetchNews = async (query: string) => {
-    const API_KEY = process.env.NEXT_PUBLIC_NEWS_API_KEY;
+  // const fetchNews = async (query: string) => {
+  //   const API_KEY = process.env.NEXT_PUBLIC_NEWS_API_KEY;
 
-    try {
-      setLoading(true);
-      const response = await fetch(
-        `https://newsapi.org/v2/everything?q=${query}&sortBy=publishedAt&apiKey=${API_KEY}&pageSize=24`
-      );
+  //   try {
+  //     setLoading(true);
+  //     const response = await fetch(
+  //       `https://newsapi.org/v2/everything?q=${query}&sortBy=publishedAt&apiKey=${API_KEY}&pageSize=24`
+  //     );
 
-      // if (!response.ok) {
-      //   throw new Error("Failed to fetch news");
-      // }
+  //     // if (!response.ok) {
+  //     //   throw new Error("Failed to fetch news");
+  //     // }
 
-      const data = await response.json();
-      setNews(data.articles);
-      setError(null);
-    } catch (err) {
-      // setError("Failed to fetch news. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  //     const data = await response.json();
+  //     setNews(data.articles);
+  //     setError(null);
+  //   } catch (err) {
+  //     // setError("Failed to fetch news. Please try again.");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   return (
     <div
@@ -918,7 +918,7 @@ export default function NewsPage() {
                     )}
 
                     {/* Gnews Section*/}
-                    {gNewsLoading ? (
+                    {/* {gNewsLoading ? (
                       <LoadingSkeleton />
                     ) : gNewsError ? (
                       <div className="text-red-500 text-center">
@@ -1032,7 +1032,7 @@ export default function NewsPage() {
                             ))}
                         </div>
                       </section>
-                    )}
+                    )} */}
 
                     {/* Reddit Section */}
                     <section className="mb-12 flex flex-col ">
