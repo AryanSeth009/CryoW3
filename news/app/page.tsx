@@ -207,9 +207,8 @@ export default function NewsPage() {
       const response = await fetch(url);
 
       if (!response.ok) {
-        console.error(
-          `GNews API request failed with status: ${response.status}`
-        );
+        const errorData = await response.json();
+        console.error(`GNews API request failed: ${errorData.message}`);
         setGNewsError("Failed to fetch GNews. Please try again.");
         return;
       }
@@ -1322,8 +1321,8 @@ export default function NewsPage() {
               {/* New mixed news section */}
               {[
                 ...rssNews.slice(6, 9),
-                ...redditNews.slice(6,9 ),
-                ...gNews.slice(0, 4),
+                ...redditNews.slice(6, 9),
+               
                 ...newsData.slice(0, 4),
               ].map((article, index) => (
                 <Link
