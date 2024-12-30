@@ -598,28 +598,28 @@ export default function NewsPage() {
     );
   };
 
-  const fetchNews = async (query: string) => {
-    const API_KEY = process.env.NEXT_PUBLIC_NEWS_API_KEY;
+  // const fetchNews = async (query: string) => {
+  //   const API_KEY = process.env.NEXT_PUBLIC_NEWS_API_KEY;
 
-    try {
-      setLoading(true);
-      const response = await fetch(
-        `https://newsapi.org/v2/everything?q=${query}&sortBy=publishedAt&apiKey=${API_KEY}&pageSize=24`
-      );
+  //   try {
+  //     setLoading(true);
+  //     const response = await fetch(
+  //       `https://newsapi.org/v2/everything?q=${query}&sortBy=publishedAt&apiKey=${API_KEY}&pageSize=24`
+  //     );
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch news");
-      }
+  //     if (!response.ok) {
+  //       throw new Error("Failed to fetch news");
+  //     }
 
-      const data = await response.json();
-      setNews(data.articles);
-      setError(null);
-    } catch (err) {
-      setError("Failed to fetch news. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  //     const data = await response.json();
+  //     setNews(data.articles);
+  //     setError(null);
+  //   } catch (err) {
+  //     setError("Failed to fetch news. Please try again.");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   return (
     <div
