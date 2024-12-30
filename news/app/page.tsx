@@ -320,7 +320,8 @@ export default function NewsPage() {
 
       if (!response.ok) {
         console.error(
-          `YouTube API request failed with status: ${response.status}`
+          `YouTube API request failed with status
+          : ${response.status}`
         );
         setYoutubeError("");
         return;
