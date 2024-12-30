@@ -274,7 +274,7 @@ export default function NewsPage() {
       const API_KEY = process.env.NEXT_PUBLIC_YOUTUBE_API_KEY;
       if (!API_KEY) {
         console.warn("YouTube API key is not configured");
-        setYoutubeVideos([]);
+        setYoutubeVideos([]); 
         return;
       }
 
@@ -512,7 +512,7 @@ export default function NewsPage() {
     if (searchTerm.trim()) {
       // fetchCurrentsNews(searchTerm.trim());
       // // fetchNews(searchTerm.trim());
-      // fetchYouTubeVideos(searchTerm.trim());
+      fetchYouTubeVideos(searchTerm.trim());
       fetchRedditNews(null, searchTerm.trim());
       fetchRSSFeeds();
       // fetchTwitterPosts("elonmusk"); // Keep showing Elon's tweets regardless of search
@@ -548,7 +548,7 @@ export default function NewsPage() {
     setSearchTerm(defaultQuery);
     // fetchGNews(defaultQuery);
     // // fetchNews(defaultQuery);
-    // fetchYouTubeVideos(defaultQuery);
+    fetchYouTubeVideos(defaultQuery);
     fetchRedditNews(null, defaultQuery);
     fetchRSSFeeds();
   }, []);
