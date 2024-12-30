@@ -184,6 +184,15 @@ export default function NewsPage() {
   const [youtubeLoading, setYoutubeLoading] = useState(true);
   const [youtubeError, setYoutubeError] = useState<string | null>(null);
 
+  // Add state variables for NewsData.io
+  const [newsData, setNewsData] = useState<NewsArticle[]>([]);
+  const [newsDataLoading, setNewsDataLoading] = useState(true);
+  const [newsDataError, setNewsDataError] = useState<string | null>(null);
+
+  // Add state variables for pagination
+  const [newsDataCurrentPage, setNewsDataCurrentPage] = useState(1);
+  const newsDataItemsPerPage = 9; // Number of items to display per page
+
   const fetchGNews = async (query: string = "cryptocurrency") => {
     try {
       setGNewsLoading(true);
@@ -480,6 +489,53 @@ export default function NewsPage() {
     }
   };
 
+  // Fetch NewsData.io articles with pagination
+  const fetchNewsData = async (
+    query: string = "cryptocurrency",
+    page: number = 1
+  ) => {
+    try {
+      setNewsDataLoading(true);
+      const API_KEY = process.env.NEXT_PUBLIC_NEWS_DATA_API_KEY;
+      const url = `https://newsdata.io/api/1/news?apikey=${API_KEY}&q=${encodeURIComponent(
+        query
+      )}&page=${page}&size=${newsDataItemsPerPage}`;
+
+      console.log("Fetching URL:", url); // Log the URL
+
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        console.error(
+          `NewsData.io API request failed with status: ${response.status}`
+        );
+        setNewsDataError(
+          "Failed to fetch news from NewsData.io. Please try again."
+        );
+        return;
+      }
+
+      const data = await response.json();
+      setNewsData(data.results);
+      setNewsDataError(null);
+    } catch (error) {
+      console.error("Error fetching NewsData.io articles:", error);
+      setNewsDataError(
+        "Failed to fetch news from NewsData.io. Please try again."
+      );
+    } finally {
+      setNewsDataLoading(false);
+    }
+  };
+
+  // Function to handle page change
+  const handleNewsDataPageChange = (newPage: number) => {
+    if (newPage > 0) {
+      setNewsDataCurrentPage(newPage);
+      fetchNewsData(searchTerm, newPage); // Fetch news data for the new page
+    }
+  };
+
   useEffect(() => {
     const defaultQuery = "cryptocurrency news";
     setSearchTerm(defaultQuery);
@@ -488,7 +544,8 @@ export default function NewsPage() {
     fetchYouTubeVideos(defaultQuery);
     fetchRedditNews(null, defaultQuery);
     fetchRSSFeeds();
-  }, []);
+    fetchNewsData(defaultQuery, newsDataCurrentPage); // Fetch NewsData.io articles
+  }, [searchTerm, newsDataCurrentPage]);
 
   const LoadingSkeleton = () => (
     <div className="space-y-8 animate-pulse">
@@ -761,9 +818,9 @@ export default function NewsPage() {
                             <div className="relative w-full h-[300px] rounded-3xl overflow-hidden">
                               <Image
                                 src={
-                                  news[0].urlToImage || DEFAULT_FALLBACK_IMAGE
+                                  rssNews[0].urlToImage || DEFAULT_FALLBACK_IMAGE
                                 }
-                                alt={news[0].title}
+                                alt={rssNews[0].title}
                                 fill
                                 className="object-cover transition-transform duration-700 group-hover:scale-105"
                               />
@@ -1100,6 +1157,106 @@ export default function NewsPage() {
                         ))}
                       </div>
                     </section>
+
+                    {/* NewsData.io Section */}
+                    {newsDataLoading ? (
+                      <LoadingSkeleton />
+                    ) : newsDataError ? (
+                      <div className="text-red-500 text-center">
+                        {newsDataError}
+                      </div>
+                    ) : (
+                      <section className="mb-12 flex flex-col">
+                        <h2 className="text-4xl w-full font-normal font-sans flex items-center justify-between">
+                          NewsData.io Cryptocurrency
+                        </h2>
+                        <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-3">
+                          {newsData.map((article, index) => (
+                            <Link
+                              key={index}
+                              href={article.url || "#"}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="group"
+                            >
+                              <Card className="bg-[#0A0B0F]/60 backdrop-blur-xl border-white/10 rounded-xl hover:rounded-2xl hover:border-[#8B5CF6]/50 hover:border-purple-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/10 transform hover:-translate-y-1">
+                                <div className="relative h-48 rounded-t-xl overflow-hidden">
+                                  <Image
+                                    src={
+                                      article.image || DEFAULT_FALLBACK_IMAGE
+                                    }
+                                    alt={article.title}
+                                    fill
+                                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                                  />
+                                  <div className="absolute inset-0 bg-gradient-to-t from-[#231d30] via-transparent opacity-50" />
+                                  <Badge className="absolute top-4 left-4 bg-purple-500/90 hover:bg-purple-600">
+                                    {article.source?.name || "Unknown Source"}
+                                  </Badge>
+                                </div>
+                                <div className="p-4">
+                                  <h3 className="font-semibold text-md leading-tight group-hover:text-purple-500 transition-colors line-clamp-2 mb-3">
+                                    {article.title}
+                                  </h3>
+                                  <p className="text-sm text-gray-400 line-clamp-3 mb-4">
+                                    {article.description}
+                                  </p>
+                                  <div className="flex items-center gap-4 text-sm text-gray-400">
+                                    <div className="flex items-center gap-2">
+                                      <Avatar className="h-6 w-6 border-2 border-purple-500/30">
+                                        <Image
+                                          src={
+                                            article.source?.icon ||
+                                            DEFAULT_FALLBACK_IMAGE
+                                          }
+                                          alt="Source"
+                                          width={24}
+                                          height={24}
+                                        />
+                                      </Avatar>
+                                      <span className="font-small">
+                                        {article.source?.name ||
+                                          "Unknown Source"}
+                                      </span>
+                                    </div>
+                                    <span>•</span>
+                                    <div className="flex items-center gap-2 opacity-60">
+                                      <span>
+                                        {new Date(
+                                          article.publishedAt
+                                        ).toLocaleDateString()}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </Card>
+                            </Link>
+                          ))}
+                        </div>
+
+                        {/* Pagination Controls */}
+                        <div className="flex justify-center gap-4 mt-6">
+                          <Button
+                            onClick={() =>
+                              handleNewsDataPageChange(newsDataCurrentPage - 1)
+                            }
+                            disabled={newsDataCurrentPage === 1}
+                            className="px-4 py-2 bg-purple-500 text-white rounded-lg disabled:bg-gray-400"
+                          >
+                            Previous
+                          </Button>
+                          <Button
+                            onClick={() =>
+                              handleNewsDataPageChange(newsDataCurrentPage + 1)
+                            }
+                            disabled={newsData.length < newsDataItemsPerPage}
+                            className="px-4 py-2 bg-purple-500 text-white rounded-lg disabled:bg-gray-400"
+                          >
+                            Next
+                          </Button>
+                        </div>
+                      </section>
+                    )}
                   </>
                 )}
               </>
@@ -1113,7 +1270,7 @@ export default function NewsPage() {
               <h2 className="text-4xl font-normal font-sans">Recommended</h2>
             </div>
             <div className="space-y-6">
-              {news.slice(4, 5).map((article, index) => (
+              {rssNews.slice(4, 5).map((article, index) => (
                 <Link
                   key={index}
                   href={article.url}
@@ -1148,7 +1305,7 @@ export default function NewsPage() {
                 </Link>
               ))}
 
-              {news.slice(5, 48).map((article, index) => (
+              {rssNews.slice(5, 9).map((article, index) => (
                 <Link
                   key={index}
                   href={article.url}
