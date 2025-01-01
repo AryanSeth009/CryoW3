@@ -1292,7 +1292,7 @@ export default function NewsPage() {
                         variant="outline"
                         className="text-purple-500 border-purple-500/30 bg-purple-500/5"
                       >
-                        {article.source?.name || article.type || "Unknown Source"}
+                        {article.source?.name  || "Unknown Source"}
                       </Badge>
                       <div className="flex items-center gap-2 opacity-60">
                         <span>12 hours ago</span>
