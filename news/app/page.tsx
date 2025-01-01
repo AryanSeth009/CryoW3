@@ -439,7 +439,7 @@ export default function NewsPage() {
 
   const handleNavbarSearch = (query: string) => {
     setSearchTerm(query);
-    fetchCoinNews();
+    // fetchCoinNews();
     // fetchNews(query);
     fetchYouTubeVideos(query);
     fetchRedditNews(null, query);
@@ -480,62 +480,62 @@ export default function NewsPage() {
     }
   };
 
-  const fetchCoinNews = async () => {
-    setLoading(true);
-    const feeds = [
-      "https://www.coindesk.com/feed/",
-      "https://cointelegraph.com/rss",
-    ];
+  // // const fetchCoinNews = async () => {
+  // //   setLoading(true);
+  // //   const feeds = [
+  // //     "https://www.coindesk.com/feed/",
+  // //     "https://cointelegraph.com/rss",
+  // //   ];
 
-    try {
-      const responses = await Promise.all(
-        feeds.map((feed) =>
-          fetch(
-            `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(
-              feed
-            )}`
-          )
-        )
-      );
+  // //   try {
+  // //     const responses = await Promise.all(
+  // //       feeds.map((feed) =>
+  // //         fetch(
+  // //           `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(
+  // //             feed
+  // //           )}`
+  // //         )
+  // //       )
+  // //     );
 
-      const data = await Promise.all(responses.map((res) => res.json()));
+  // //     const data = await Promise.all(responses.map((res) => res.json()));
 
-      const articles = data.flatMap((feed) =>
-        feed.items.map((item) => ({
-          title: item.title,
-          description: item.description,
-          url: item.link,
-          publishedAt: item.pubDate,
-          imageUrl: item.thumbnail || DEFAULT_FALLBACK_IMAGE,
-          source: {
-            name: feed.feed.title, // Assuming the feed title is the source name
-            icon: DEFAULT_FALLBACK_IMAGE, // You can set a specific icon if available
-          },
-        }))
-      );
+  // //     const articles = data.flatMap((feed) =>
+  // //       feed.items.map((item) => ({
+  // //         title: item.title,
+  // //         description: item.description,
+  // //         url: item.link,
+  // //         publishedAt: item.pubDate,
+  // //         imageUrl: item.thumbnail || DEFAULT_FALLBACK_IMAGE,
+  // //         source: {
+  // //           name: feed.feed.title, // Assuming the feed title is the source name
+  // //           icon: DEFAULT_FALLBACK_IMAGE, // You can set a specific icon if available
+  // //         },
+  // //       }))
+  // //     );
 
-      // Filter articles based on the keyword
-      const filteredArticles = articles.filter(
-        (article) =>
-          article.title.toLowerCase().includes(keyword.toLowerCase()) ||
-          article.description.toLowerCase().includes(keyword.toLowerCase())
-      );
+  // //     // Filter articles based on the keyword
+  // //     const filteredArticles = articles.filter(
+  // //       (article) =>
+  // //         article.title.toLowerCase().includes(keyword.toLowerCase()) ||
+  // //         article.description.toLowerCase().includes(keyword.toLowerCase())
+  // //     );
 
-      // Limit to at least 6 articles
-      const limitedArticles = filteredArticles.slice(0, 6);
-      setCoinNews(limitedArticles);
-      setError(null);
-    } catch (err) {
-      console.error("Coin News Error:", err);
-      setError("Failed to fetch coin news. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  // //     // Limit to at least 6 articles
+  // //     const limitedArticles = filteredArticles.slice(0, 6);
+  // //     setCoinNews(limitedArticles);
+  // //     setError(null);
+  // //   } catch (err) {
+  // //     console.error("Coin News Error:", err);
+  // //     setError("Failed to fetch coin news. Please try again.");
+  // //   } finally {
+  // //     setLoading(false);
+  // //   }
+  // // };
 
-  useEffect(() => {
-    // fetchCoinNews(); // Fetch news based on the keyword
-  }, []); // Fetch once on component mount
+  // useEffect(() => {
+  //   // fetchCoinNews(); // Fetch news based on the keyword
+  // }, []); // Fetch once on component mount
 
   useEffect(() => {
     const defaultQuery = "cryptocurrency news";
