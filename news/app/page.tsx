@@ -3,7 +3,7 @@
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Avatar as AvatarComponent } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
+import { Card } from "@/components/ui/card"; 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -184,6 +184,8 @@ export default function NewsPage() {
   const [youtubeLoading, setYoutubeLoading] = useState(true);
   const [youtubeError, setYoutubeError] = useState<string | null>(null);
 
+  const [coinNews, setCoinNews] = useState([]);
+
   const fetchGNews = async (query: string = "cryptocurrency") => {
     try {
       setGNewsLoading(true);
@@ -258,8 +260,7 @@ export default function NewsPage() {
   ) => {
     try {
       const redditResponse = await fetch(
-        `https://www.reddit.com/r/CryptoCurrency/search.json?q=${query}&sort=top&limit=9${
-          afterToken ? `&after=${afterToken}` : ""
+        `https://www.reddit.com/r/CryptoCurrency/search.json?q=${query}&sort=top&limit=9${afterToken ? `&after=${afterToken}` : ""
         }`
       );
       const redditData = await redditResponse.json();
@@ -390,9 +391,8 @@ export default function NewsPage() {
 
       const url = `https://twitter-api45.p.rapidapi.com/usermedia.php?screenname=${encodeURIComponent(
         query
-      )}${
-        pageToken ? `&pagination_token=${encodeURIComponent(pageToken)}` : ""
-      }`;
+      )}${pageToken ? `&pagination_token=${encodeURIComponent(pageToken)}` : ""
+        }`;
 
       const response = await fetch(url, {
         method: "GET",
@@ -439,6 +439,7 @@ export default function NewsPage() {
 
   const handleNavbarSearch = (query: string) => {
     setSearchTerm(query);
+    fetchCoinNews();
     // fetchNews(query);
     fetchYouTubeVideos(query);
     fetchRedditNews(null, query);
@@ -448,6 +449,7 @@ export default function NewsPage() {
   const handleSearch = () => {
     if (searchTerm.trim()) {
       // fetchNews(searchTerm.trim());
+
       fetchYouTubeVideos(searchTerm.trim());
       fetchRedditNews(null, searchTerm.trim());
       fetchTwitterPosts("elonmusk"); // Keep showing Elon's tweets regardless of search
@@ -477,6 +479,63 @@ export default function NewsPage() {
       fetchTwitterPosts(searchTerm, prevTwitterPageToken);
     }
   };
+
+  const fetchCoinNews = async () => {
+    setLoading(true);
+    const feeds = [
+      "https://www.coindesk.com/feed/",
+      "https://cointelegraph.com/rss",
+    ];
+
+    try {
+      const responses = await Promise.all(
+        feeds.map((feed) =>
+          fetch(
+            `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(
+              feed
+            )}`
+          )
+        )
+      );
+
+      const data = await Promise.all(responses.map((res) => res.json()));
+
+      const articles = data.flatMap((feed) =>
+        feed.items.map((item) => ({
+          title: item.title,
+          description: item.description,
+          url: item.link,
+          publishedAt: item.pubDate,
+          imageUrl: item.thumbnail || DEFAULT_FALLBACK_IMAGE,
+          source: {
+            name: feed.feed.title, // Assuming the feed title is the source name
+            icon: DEFAULT_FALLBACK_IMAGE, // You can set a specific icon if available
+          },
+        }))
+      );
+
+      // Filter articles based on the keyword
+      const filteredArticles = articles.filter(
+        (article) =>
+          article.title.toLowerCase().includes(keyword.toLowerCase()) ||
+          article.description.toLowerCase().includes(keyword.toLowerCase())
+      );
+
+      // Limit to at least 6 articles
+      const limitedArticles = filteredArticles.slice(0, 6);
+      setCoinNews(limitedArticles);
+      setError(null);
+    } catch (err) {
+      console.error("Coin News Error:", err);
+      setError("Failed to fetch coin news. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    // fetchCoinNews(); // Fetch news based on the keyword
+  }, []); // Fetch once on component mount
 
   useEffect(() => {
     const defaultQuery = "cryptocurrency news";
@@ -586,9 +645,8 @@ export default function NewsPage() {
 
     return (
       <Button
-        className={`fixed bottom-4 right-4 bg-purple-500 hover:bg-purple-600 text-white rounded-full p-2 transition-opacity duration-300 ${
-          isVisible ? "opacity-100" : "opacity-0"
-        }`}
+        className={`fixed bottom-4 right-4 bg-purple-500 hover:bg-purple-600 text-white rounded-full p-2 transition-opacity duration-300 ${isVisible ? "opacity-100" : "opacity-0"
+          }`}
         onClick={scrollToTop}
       >
         <ChevronUp className="h-6 w-6" />
@@ -676,8 +734,8 @@ export default function NewsPage() {
             ) : (
               <>
                 {redditNews.length === 0 &&
-                youtubeVideos.length === 0 &&
-                rssNews.length === 0 ? (
+                  youtubeVideos.length === 0 &&
+                  rssNews.length === 0 ? (
                   <div className="text-center py-10">
                     <p className="text-xl text-gray-400">
                       No news available. Please try refreshing the page.
@@ -770,8 +828,7 @@ export default function NewsPage() {
                               onClick={() =>
                                 prevPageToken &&
                                 fetchYouTubeVideos(
-                                  `${
-                                    searchTerm || "cryptocurrency"
+                                  `${searchTerm || "cryptocurrency"
                                   } ${prevPageToken}`
                                 )
                               }
@@ -786,8 +843,7 @@ export default function NewsPage() {
                               onClick={() =>
                                 nextPageToken &&
                                 fetchYouTubeVideos(
-                                  `${
-                                    searchTerm || "cryptocurrency"
+                                  `${searchTerm || "cryptocurrency"
                                   } ${nextPageToken}`
                                 )
                               }
@@ -982,7 +1038,7 @@ export default function NewsPage() {
                                 <Image
                                   src={
                                     article.urlToImage &&
-                                    article.urlToImage.startsWith("http")
+                                      article.urlToImage.startsWith("http")
                                       ? article.urlToImage
                                       : DEFAULT_FALLBACK_IMAGE
                                   }
@@ -1076,6 +1132,73 @@ export default function NewsPage() {
                         ))}
                       </div>
                     </section>
+
+                    {/* <section className="mb-12 flex flex-col">
+                      <div className="flex mb-4">
+                        <h2 className="text-4xl w-full font-normal font-sans flex items-center justify-between">
+                          CoinDesk & CoinTelegraph News
+                        </h2>
+                      </div>
+                      <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-3">
+                        {loading && <p className="text-gray-500">Loading...</p>}
+                        {error && <p className="text-red-500">{error}</p>}
+                        {coinNews.length > 0 ? (
+                          coinNews.map((article, index) => (
+                            <Link
+                              key={index}
+                              href={article.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="group"
+                            >
+                              <Card className="bg-[#0A0B0F]/60 backdrop-blur-xl border-white/10 rounded-xl hover:rounded-2xl hover:border-[#8B5CF6]/50 hover:border-purple-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/10 transform hover:-translate-y-1">
+                                <div className="relative h-48 rounded-t-xl overflow-hidden">
+                                  <Image
+                                    src={article.imageUrl}
+                                    alt={article.title}
+                                    fill
+                                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                                  />
+                                  <div className="absolute inset-0 bg-gradient-to-t from-[#231d30] via-transparent opacity-50" />
+                                  <Badge className="absolute top-4 left-4 bg-purple-500/90 hover:bg-purple-600">
+                                    {article.source.name}
+                                  </Badge>
+                                </div>
+                                <div className="p-4">
+                                  <h3 className="font-semibold text-md leading-tight group-hover:text-purple-500 transition-colors line-clamp-2 mb-3">
+                                    {article.title}
+                                  </h3>
+                                  <div className="flex items-center gap-4 text-sm text-gray-400">
+                                    <div className="flex items-center gap-2">
+                                      <Avatar className="h-6 w-6 border-2 border-purple-500/30">
+                                        <Image
+                                          src={article.source.icon}
+                                          alt="Source"
+                                          width={24}
+                                          height={24}
+                                        />
+                                      </Avatar>
+                                    </div>
+                                    <span>•</span>
+                                    <div className="flex items-center gap-2 opacity-60">
+                                      <span>
+                                        {new Date(
+                                          article.publishedAt
+                                        ).toLocaleDateString()}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </Card>
+                            </Link>
+                          ))
+                        ) : (
+                          <p className="text-gray-500">
+                            No news articles available.
+                          </p>
+                        )}
+                      </div>
+                    </section> */}
                   </>
                 )}
               </>
@@ -1124,38 +1247,59 @@ export default function NewsPage() {
                 </Link>
               ))}
 
-              {rssNews.slice(5, 10).map((article, index) => (
+              {/* New mixed news section */}
+              {/* New mixed news section */}
+              {[
+                 ...rssNews.slice(6, 9),
+                 ...redditNews.slice(6, 9),
+                
+                
+               
+             
+                ...youtubeVideos.slice(6, 9).map(video => ({
+                  ...video,
+                  type: 'youtube',
+                  url: `https://www.youtube.com/watch?v=${video.id.videoId}`,
+                  urlToImage: video.snippet.thumbnails.medium.url,
+                  title: video.snippet.title,
+                  source: { name: video.snippet.channelTitle }
+                }))
+              ].map((article, index) => (
                 <Link
                   key={index}
-                  href={article.url}
+                  href={article.url || '#'}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="group block"
                 >
-                  <Card className="flex gap-5 bg-[#0A0B0F]/60 backdrop-blur-xl border-white/10 rounded-xl hover:rounded-2xl hover:border-[#8B5CF6]/50  transition-all duration-300">
+                  <Card className="flex gap-5 bg-[#0A0B0F]/60 backdrop-blur-xl border-white/10 rounded-xl hover:rounded-2xl hover:border-[#8B5CF6]/50 transition-all duration-300">
                     <div className="relative w-[100px] h-[100px]">
                       <Image
-                        src={article.urlToImage || DEFAULT_FALLBACK_IMAGE}
-                        alt={article.title}
+                        src={
+                          article.urlToImage &&
+                            (article.urlToImage.startsWith("http") ||
+                              article.urlToImage.startsWith("/"))
+                            ? article.urlToImage
+                            : DEFAULT_FALLBACK_IMAGE
+                        }
+                        alt={article.title || 'News Article'}
                         fill
                         className="rounded-xl object-cover"
                       />
                     </div>
-                    <div className="flex-1 p-2">
-                      <h3 className="font-semibold text-sm leading-snug group-hover:text-purple-500 transition-colors line-clamp-2 mb-2">
+                    <div className="flex-1 py-2 pr-4">
+                      <Badge
+                        variant="outline"
+                        className="text-purple-500 border-purple-500/30 bg-purple-500/5"
+                      >
+                        {article.source?.name || article.type || "Unknown Source"}
+                      </Badge>
+                      <div className="flex items-center gap-2 opacity-60">
+                        <span>12 hours ago</span>
+                      </div>
+                      <h3 className="text-sm font-semibold line-clamp-2">
                         {article.title}
                       </h3>
-                      <div className="flex items-center gap-3 text-sm text-gray-400">
-                        <Badge
-                          variant="outline"
-                          className="text-purple-500 border-purple-500/30 bg-purple-500/5"
-                        >
-                          {article.source.name}
-                        </Badge>
-                        <div className="flex items-center gap-2 opacity-60">
-                          <span>12 hours ago</span>
-                        </div>
-                      </div>
                     </div>
                   </Card>
                 </Link>
