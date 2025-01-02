@@ -1,7 +1,7 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-
+import { Analytics } from "@vercel/analytics/react"
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -19,6 +19,7 @@ export default function RootLayout({
     <html lang="en">
       <head>
       <link rel="icon" href="/ico2.jpg" sizes="180x180"/>
+
         <script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2453106113138380"
@@ -26,6 +27,7 @@ export default function RootLayout({
         ></script>
       </head>
       <body className={inter.className}>{children}</body>
+      <Analytics />
     </html>
   );
 }

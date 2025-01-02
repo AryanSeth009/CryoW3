@@ -1,9 +1,8 @@
-import { Loader2, Check, ChromeIcon as Google } from "lucide-react";
+import { Loader2, Check } from "lucide-react";
 
-export const Icons: FC = {
+export const Icons = {
     spinner: Loader2,
     check: Check,
-    google: Google,
     // Add other icons as needed
   };
   
