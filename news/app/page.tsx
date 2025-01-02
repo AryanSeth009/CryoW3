@@ -354,12 +354,13 @@ export default function NewsPage() {
   const fetchRSSFeeds = async () => {
     try {
       setRssLoading(true);
+  
       const feeds = [
         "https://www.newsbtc.com/feed/",
         "https://bitcoinmagazine.com/.rss/full/",
         "https://cryptopotato.com/feed/",
       ];
-
+  
       const responses = await Promise.allSettled(
         feeds.map((feed) =>
           fetch(
@@ -367,46 +368,44 @@ export default function NewsPage() {
           )
         )
       );
-      
+  
       const data = await Promise.all(
         responses
           .filter((response) => response.status === "fulfilled")
           .map((response: any) => response.value.json())
       );
-      
-
+  
       const transformedArticles = data.flatMap((feed) =>
-        feed.items.map((item: any) => ({
-          title: item.title,
-          description: item.description,
-          url: item.link,
-          urlToImage: item.thumbnail || item.enclosure?.link,
+        feed.items?.map((item: any) => ({
+          title: item.title || "No title available",
+          description: item.description || "No description available",
+          url: item.link || "#",
+          urlToImage: item.thumbnail || item.enclosure?.link || "",
           source: {
-            name: feed.feed.title,
-            icon: feed.feed.favicon,
+            name: feed.feed?.title || "Unknown Source",
+            icon: feed.feed?.favicon || "",
           },
-          publishedAt: item.pubDate,
-        }))
+          publishedAt: item.pubDate || new Date().toISOString(),
+        })) || []
       );
-
-      // Sort by date and take latest 6 articles
+  
       const sortedArticles = transformedArticles
         .sort(
           (a, b) =>
-            new Date(b.publishedAt).getTime() -
-            new Date(a.publishedAt).getTime()
+            new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
         )
         .slice(0, 9);
-
+  
       setRssNews(sortedArticles);
       setError(null);
     } catch (err) {
-      console.error("RSS Feed Error:", err);
+      console.error("RSS Feed Error:", err?.message || err);
       setError("Failed to fetch RSS feeds. Please try again.");
     } finally {
       setRssLoading(false);
     }
   };
+  
 
   // const fetchTwitterPosts = async (
   //   query: string,

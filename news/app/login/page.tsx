@@ -169,12 +169,13 @@ export default function LoginPage() {
         </div>
 
         <div className="text-center text-sm">
-          <Link
-            href="/signup"
-            className="text-gray-500 font-semibold font-sans hover:text-gray-900"
-          >
-            Don't have an account yet? Sign Up
-          </Link>
+        <Link
+  href="/signup"
+  className="text-gray-500 font-semibold font-sans hover:text-gray-900"
+>
+  Don&apos;t have an account yet? Sign Up
+</Link>
+
         </div>
       </div>
     </div>
