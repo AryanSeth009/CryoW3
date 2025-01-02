@@ -360,17 +360,20 @@ export default function NewsPage() {
         "https://cryptopotato.com/feed/",
       ];
 
-      const responses = await Promise.all(
+      const responses = await Promise.allSettled(
         feeds.map((feed) =>
           fetch(
-            `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(
-              feed
-            )}`
+            `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feed)}`
           )
         )
       );
-
-      const data = await Promise.all(responses.map((res) => res.json()));
+      
+      const data = await Promise.all(
+        responses
+          .filter((response) => response.status === "fulfilled")
+          .map((response: any) => response.value.json())
+      );
+      
 
       const transformedArticles = data.flatMap((feed) =>
         feed.items.map((item: any) => ({
@@ -405,61 +408,61 @@ export default function NewsPage() {
     }
   };
 
-  const fetchTwitterPosts = async (
-    query: string,
-    pageToken: string | null = null
-  ) => {
-    try {
-      setLoading(true);
+  // const fetchTwitterPosts = async (
+  //   query: string,
+  //   pageToken: string | null = null
+  // ) => {
+  //   try {
+  //     setLoading(true);
 
-      const url = `https://twitter-api45.p.rapidapi.com/usermedia.php?screenname=${encodeURIComponent(
-        query
-      )}${
-        pageToken ? `&pagination_token=${encodeURIComponent(pageToken)}` : ""
-      }`;
+  //     const url = `https://twitter-api45.p.rapidapi.com/usermedia.php?screenname=${encodeURIComponent(
+  //       query
+  //     )}${
+  //       pageToken ? `&pagination_token=${encodeURIComponent(pageToken)}` : ""
+  //     }`;
 
-      const response = await fetch(url, {
-        method: "GET",
-        headers: {
-          "X-RapidAPI-Key": "7760b52a34mshe145977f1ea47fep190b18jsn60ad0f119d3",
-          "X-RapidAPI-Host": "twitter-api45.p.rapidapi.com",
-        },
-      });
+  //     const response = await fetch(url, {
+  //       method: "GET",
+  //       headers: {
+  //         "X-RapidAPI-Key": "7760b52a34mshe145977f1ea47fep190b18jsn60ad0f119d3",
+  //         "X-RapidAPI-Host": "twitter-api45.p.rapidapi.com",
+  //       },
+  //     });
 
-      if (!response.ok) {
-        throw new Error(`Failed to fetch Twitter posts: ${response.status}`);
-      }
+  //     if (!response.ok) {
+  //       throw new Error(`Failed to fetch Twitter posts: ${response.status}`);
+  //     }
 
-      const data = await response.json();
+  //     const data = await response.json();
 
-      // Transform the API response to match our TwitterPost interface
-      const transformedPosts =
-        data?.map((tweet: any) => ({
-          id: tweet.id_str || tweet.id,
-          text: tweet.text || tweet.full_text,
-          user: {
-            name: tweet.user.name,
-            screen_name: tweet.user.screen_name,
-            profile_image_url:
-              tweet.user.profile_image_url_https ||
-              tweet.user.profile_image_url,
-          },
-          created_at: tweet.created_at,
-        })) || [];
+  //     // Transform the API response to match our TwitterPost interface
+  //     const transformedPosts =
+  //       data?.map((tweet: any) => ({
+  //         id: tweet.id_str || tweet.id,
+  //         text: tweet.text || tweet.full_text,
+  //         user: {
+  //           name: tweet.user.name,
+  //           screen_name: tweet.user.screen_name,
+  //           profile_image_url:
+  //             tweet.user.profile_image_url_https ||
+  //             tweet.user.profile_image_url,
+  //         },
+  //         created_at: tweet.created_at,
+  //       })) || [];
 
-      setTwitterPosts(transformedPosts);
+  //     setTwitterPosts(transformedPosts);
 
-      // Update pagination tokens if available in the response
-      setNextTwitterPageToken(data.pagination_token || null);
-      setPrevTwitterPageToken(null); // This endpoint might not support previous page
-      setError(null);
-    } catch (err) {
-      console.error("Twitter API Error:", err);
-      setError("Failed to fetch Twitter posts. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  //     // Update pagination tokens if available in the response
+  //     setNextTwitterPageToken(data.pagination_token || null);
+  //     setPrevTwitterPageToken(null); // This endpoint might not support previous page
+  //     setError(null);
+  //   } catch (err) {
+  //     console.error("Twitter API Error:", err);
+  //     setError("Failed to fetch Twitter posts. Please try again.");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const handleNavbarSearch = (query: string) => {
     setSearchTerm(query);
@@ -476,7 +479,7 @@ export default function NewsPage() {
 
       fetchYouTubeVideos(searchTerm.trim());
       fetchRedditNews(null, searchTerm.trim());
-      fetchTwitterPosts("elonmusk"); // Keep showing Elon's tweets regardless of search
+      // fetchTwitterPosts("elonmusk"); // Keep showing Elon's tweets regardless of search
     }
   };
 
@@ -492,17 +495,17 @@ export default function NewsPage() {
     }
   };
 
-  const handleNextTwitterPage = () => {
-    if (nextTwitterPageToken) {
-      fetchTwitterPosts(searchTerm, nextTwitterPageToken);
-    }
-  };
+  // const handleNextTwitterPage = () => {
+  //   if (nextTwitterPageToken) {
+  //     // fetchTwitterPosts(searchTerm, nextTwitterPageToken);
+  //   }
+  // };
 
-  const handlePrevTwitterPage = () => {
-    if (prevTwitterPageToken) {
-      fetchTwitterPosts(searchTerm, prevTwitterPageToken);
-    }
-  };
+  // const handlePrevTwitterPage = () => {
+  //   if (prevTwitterPageToken) {
+  //     fetchTwitterPosts(searchTerm, prevTwitterPageToken);
+  //   }
+  // };
 
   // // const fetchCoinNews = async () => {
   // //   setLoading(true);
