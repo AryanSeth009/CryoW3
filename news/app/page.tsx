@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/icons";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect,useCallback, useState } from "react";
 import { Bell, BellIcon, Menu, X, ChevronUp } from "lucide-react";
 import Newsletter from "@/components/NewsFooter/Newsletter";
 import Footer from "@/components/NewsFooter/Footer";
@@ -323,7 +323,8 @@ export default function NewsPage() {
     }
   };
 
-  const fetchYouTubeVideos = async (query: string) => {
+  // Refactor fetchYouTubeVideos with useCallback
+  const fetchYouTubeVideos = useCallback(async (query: string) => {
     try {
       setYoutubeLoading(true);
       const response = await fetch(
@@ -349,7 +350,10 @@ export default function NewsPage() {
     } finally {
       setYoutubeLoading(false);
     }
-  };
+  }, [YOUTUBE_API_KEY]);
+
+  // Example useEffect to fetch videos
+ 
 
   const fetchRSSFeeds = async () => {
     try {
@@ -399,7 +403,7 @@ export default function NewsPage() {
       setRssNews(sortedArticles);
       setError(null);
     } catch (err) {
-      console.error("RSS Feed Error:", err?.message || err);
+      console.error("RSS Feed Error:",  err);
       setError("Failed to fetch RSS feeds. Please try again.");
     } finally {
       setRssLoading(false);
@@ -699,8 +703,8 @@ export default function NewsPage() {
       </div>
       <nav className="sticky top-0 z-50 bg-gray-900/90 backdrop-blur-xl border-b border-gray-800 shadow-lg p-4">
         <div className="container mx-auto flex items-center justify-between">
-          <img src="./ico3.png" alt="" className="h-14 w-32  " />
-          {/* <h1 className="text-2xl font-bold text-purple-500">CryoW3Times</h1> */}
+          {/* <img src="./ico3.png" alt="" className="h-14 w-32  " /> */}
+          <h1 className="text-2xl font-bold text-purple-500">CryoW3Times</h1>
           <div className="hidden md:flex items-center space-x-6">
             {["Crypto News", "NFTs", "Market Updates", "Web3", "DeFi"].map(
               (item) => (

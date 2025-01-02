@@ -40,11 +40,11 @@ export const TimeIcon = (props: React.SVGProps<SVGSVGElement>) => (
     />
   </svg>
 );
-import { Loader2, Check, ChromeIcon as Google } from "lucide-react";
+// import { Loader2, Check, ChromeIcon as Google } from "lucide-react";
 
-export const Icons: FC = {
-  spinner: Loader2,
-  check: Check,
-  google: Google,
-  // Add other icons as needed
-};
+// export const Icons: FC = {
+//   spinner: Loader2,
+//   check: Check,
+//   google: Google,
+//   // Add other icons as needed
+// };

@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation"; // Use 'next/router' for older versions
-import { Icons } from "@/components/ui/icons"; // Adjust this import based on your UI library
+import { Icons } from "@/components/Icons"; // Adjust this import based on your UI library
 import Link from "next/link";
 import AnimatedGridPattern from "@/components/ui/animated-grid-pattern";
 import { signIn } from "next-auth/react"; // Ensure this import is present
