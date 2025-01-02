@@ -302,26 +302,26 @@ export default function NewsPage() {
     }
   };
 
-  const fetchNews = async (query: string) => {
-    const API_KEY = process.env.NEXT_PUBLIC_NEWS_API_KEY;
+  // const fetchNews = async (query: string) => {
+  //   const API_KEY = process.env.NEXT_PUBLIC_NEWS_API_KEY;
 
-    try {
-      setLoading(false);
-      const response = await fetch(
-        `https://newsapi.org/v2/everything?q=${query}&sortBy=publishedAt&apiKey=${API_KEY}&pageSize=24`
-      );
+  //   try {
+  //     setLoading(false);
+  //     const response = await fetch(
+  //       `https://newsapi.org/v2/everything?q=${query}&sortBy=publishedAt&apiKey=${API_KEY}&pageSize=24`
+  //     );
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch news");
-      }
+  //     if (!response.ok) {
+  //       throw new Error("Failed to fetch news");
+  //     }
 
-      const data = await response.json();
-      setNews(data.articles);
-      setError(null);
-    } finally {
-      setLoading(false);
-    }
-  };
+  //     const data = await response.json();
+  //     setNews(data.articles);
+  //     setError(null);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const fetchYouTubeVideos = async (query: string) => {
     try {
@@ -565,7 +565,7 @@ export default function NewsPage() {
     const defaultQuery = "cryptocurrency news";
     setSearchTerm(defaultQuery);
     fetchGNews(defaultQuery);
-    fetchNews(defaultQuery);
+    // fetchNews(defaultQuery);
     fetchYouTubeVideos(defaultQuery);
     fetchRedditNews(null, defaultQuery);
     fetchRSSFeeds();
