@@ -1,3 +1,4 @@
+// app/signup/page.tsx
 "use client";
 
 import { useState } from "react";
@@ -5,9 +6,10 @@ import { useRouter } from "next/navigation"; // Use 'next/router' for older vers
 import { Icons } from "@/components/ui/icons"; // Adjust this import based on your UI library
 import Link from "next/link";
 import AnimatedGridPattern from "@/components/ui/animated-grid-pattern";
+import { signIn } from "next-auth/react"; // Ensure this import is present
 
 // Example user data for demonstration purposes
-const users = []; // This will hold the registered users
+const users: { id: number; name: string; email: string; password: string; image: string }[] = []; // This will hold the registered users
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -80,7 +82,7 @@ export default function SignUpPage() {
               <div className="w-full border-t border-gray-200" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="  px-2 pb-4 font-semibold font-sans text-gray-500">
+              <span className="px-2 pb-4 font-semibold font-sans text-gray-500">
                 Or continue with
               </span>
               {error && (
