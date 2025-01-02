@@ -3,9 +3,14 @@
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Avatar as AvatarComponent } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card"; 
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import InteractiveHoverButton from "@/components/ui/interactive-hover-button";
+import { useRouter } from "next/navigation";
+import  { PulsatingButton} from "@/components/ui/pulsating-button"; 
+import { RainbowButton } from "@/components/ui/rainbow-button";
+
 import {
   CryptoIcon,
   ChevronIcon,
@@ -21,6 +26,7 @@ import { useEffect, useState } from "react";
 import { Bell, BellIcon, Menu, X, ChevronUp } from "lucide-react";
 import Newsletter from "@/components/NewsFooter/Newsletter";
 import Footer from "@/components/NewsFooter/Footer";
+import RippleButton from "@/components/ui/ripple-button";
 
 // Inters
 interface NewsArticle {
@@ -186,6 +192,22 @@ export default function NewsPage() {
 
   const [coinNews, setCoinNews] = useState([]);
 
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // State to manage login status
+  const router = useRouter();
+
+  const handleLogin = () => {
+    router.push('/login')
+    // Implement your login logic here
+  setIsLoggedIn(true); // Set to true when user logs in
+  };
+  const handleSignup = () => {
+   router.push('/signup')
+  }
+
+  const handleLogout = () => {
+    // Implement your logout logic here
+    setIsLoggedIn(false); // Set to false when user logs out
+  };
   const fetchGNews = async (query: string = "cryptocurrency") => {
     try {
       setGNewsLoading(true);
@@ -260,7 +282,8 @@ export default function NewsPage() {
   ) => {
     try {
       const redditResponse = await fetch(
-        `https://www.reddit.com/r/CryptoCurrency/search.json?q=${query}&sort=top&limit=9${afterToken ? `&after=${afterToken}` : ""
+        `https://www.reddit.com/r/CryptoCurrency/search.json?q=${query}&sort=top&limit=9${
+          afterToken ? `&after=${afterToken}` : ""
         }`
       );
       const redditData = await redditResponse.json();
@@ -391,8 +414,9 @@ export default function NewsPage() {
 
       const url = `https://twitter-api45.p.rapidapi.com/usermedia.php?screenname=${encodeURIComponent(
         query
-      )}${pageToken ? `&pagination_token=${encodeURIComponent(pageToken)}` : ""
-        }`;
+      )}${
+        pageToken ? `&pagination_token=${encodeURIComponent(pageToken)}` : ""
+      }`;
 
       const response = await fetch(url, {
         method: "GET",
@@ -645,8 +669,9 @@ export default function NewsPage() {
 
     return (
       <Button
-        className={`fixed bottom-4 right-4 bg-purple-500 hover:bg-purple-600 text-white rounded-full p-2 transition-opacity duration-300 ${isVisible ? "opacity-100" : "opacity-0"
-          }`}
+        className={`fixed bottom-4 right-4 bg-purple-500 hover:bg-purple-600 text-white rounded-full p-2 transition-opacity duration-300 ${
+          isVisible ? "opacity-100" : "opacity-0"
+        }`}
         onClick={scrollToTop}
       >
         <ChevronUp className="h-6 w-6" />
@@ -672,7 +697,8 @@ export default function NewsPage() {
       </div>
       <nav className="sticky top-0 z-50 bg-gray-900/90 backdrop-blur-xl border-b border-gray-800 shadow-lg p-4">
         <div className="container mx-auto flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-purple-500">CryoW3Times</h1>
+          <img src="./ico3.png" alt="" className="h-14 w-32  " />
+          {/* <h1 className="text-2xl font-bold text-purple-500">CryoW3Times</h1> */}
           <div className="hidden md:flex items-center space-x-6">
             {["Crypto News", "NFTs", "Market Updates", "Web3", "DeFi"].map(
               (item) => (
@@ -697,10 +723,26 @@ export default function NewsPage() {
                 3
               </span>
             </Button>
-            <Avatar className="h-8 w-8">
-              <AvatarImage src="https://github.com/shadcn.png" alt="Profile" />
-              <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
+            {isLoggedIn ? (
+              <Avatar className="h-8 w-8">
+                <AvatarImage
+                  src="https://github.com/shadcn.png"
+                  alt="Profile"
+                />
+                <AvatarFallback>CN</AvatarFallback>
+              </Avatar>
+            ) : (
+              <div className="flex space-x-0 ">
+                {/*sign in */}
+                <Button onClick={handleLogin} className="text-md items-center text-[16px] text-center cursor-pointer  rounded-full font-sans p-6 w-24 font-semibold align-middle !bg-transparent">
+                Sign In
+              </Button>
+               { /*sign up */}
+               <InteractiveHoverButton />
+               {/* <button className="" onClick={handleSignup}> <InteractiveHoverButton /></button> */}
+              </div>
+            )}
+
             <div className="relative md:block hidden">
               <Input
                 value={searchTerm}
@@ -734,8 +776,8 @@ export default function NewsPage() {
             ) : (
               <>
                 {redditNews.length === 0 &&
-                  youtubeVideos.length === 0 &&
-                  rssNews.length === 0 ? (
+                youtubeVideos.length === 0 &&
+                rssNews.length === 0 ? (
                   <div className="text-center py-10">
                     <p className="text-xl text-gray-400">
                       No news available. Please try refreshing the page.
@@ -828,7 +870,8 @@ export default function NewsPage() {
                               onClick={() =>
                                 prevPageToken &&
                                 fetchYouTubeVideos(
-                                  `${searchTerm || "cryptocurrency"
+                                  `${
+                                    searchTerm || "cryptocurrency"
                                   } ${prevPageToken}`
                                 )
                               }
@@ -843,7 +886,8 @@ export default function NewsPage() {
                               onClick={() =>
                                 nextPageToken &&
                                 fetchYouTubeVideos(
-                                  `${searchTerm || "cryptocurrency"
+                                  `${
+                                    searchTerm || "cryptocurrency"
                                   } ${nextPageToken}`
                                 )
                               }
@@ -1038,7 +1082,7 @@ export default function NewsPage() {
                                 <Image
                                   src={
                                     article.urlToImage &&
-                                      article.urlToImage.startsWith("http")
+                                    article.urlToImage.startsWith("http")
                                       ? article.urlToImage
                                       : DEFAULT_FALLBACK_IMAGE
                                   }
@@ -1250,24 +1294,21 @@ export default function NewsPage() {
               {/* New mixed news section */}
               {/* New mixed news section */}
               {[
-                 ...rssNews.slice(6, 9),
-                 ...redditNews.slice(6, 9),
-                
-                
-               
-             
-                ...youtubeVideos.slice(6, 9).map(video => ({
+                ...rssNews.slice(6, 9),
+                ...redditNews.slice(6, 9),
+
+                ...youtubeVideos.slice(6, 9).map((video) => ({
                   ...video,
-                  type: 'youtube',
+                  type: "youtube",
                   url: `https://www.youtube.com/watch?v=${video.id.videoId}`,
                   urlToImage: video.snippet.thumbnails.medium.url,
                   title: video.snippet.title,
-                  source: { name: video.snippet.channelTitle }
-                }))
+                  source: { name: video.snippet.channelTitle },
+                })),
               ].map((article, index) => (
                 <Link
                   key={index}
-                  href={article.url || '#'}
+                  href={article.url || "#"}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="group block"
@@ -1277,12 +1318,12 @@ export default function NewsPage() {
                       <Image
                         src={
                           article.urlToImage &&
-                            (article.urlToImage.startsWith("http") ||
-                              article.urlToImage.startsWith("/"))
+                          (article.urlToImage.startsWith("http") ||
+                            article.urlToImage.startsWith("/"))
                             ? article.urlToImage
                             : DEFAULT_FALLBACK_IMAGE
                         }
-                        alt={article.title || 'News Article'}
+                        alt={article.title || "News Article"}
                         fill
                         className="rounded-xl object-cover"
                       />
@@ -1292,7 +1333,7 @@ export default function NewsPage() {
                         variant="outline"
                         className="text-purple-500 border-purple-500/30 bg-purple-500/5"
                       >
-                        {article.source?.name  || "Unknown Source"}
+                        {article.source?.name || "Unknown Source"}
                       </Badge>
                       <div className="flex items-center gap-2 opacity-60">
                         <span>12 hours ago</span>
