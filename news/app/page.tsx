@@ -321,7 +321,11 @@ export default function NewsPage() {
       setError(null);
     } catch (error) {
       console.error(error); // Log the actual error
-      setError(error.message); // Show the error message
+      if (error instanceof Error) {
+        setError(error.message); // Show the error message
+      } else {
+        setError("An unknown error occurred"); // Fallback for unknown error types
+      }
     } finally {
       setLoading(false);
     }
