@@ -7,7 +7,7 @@ import { Icons } from "@/components/Icons"; // Adjust this import based on your 
 import Link from "next/link";
 import AnimatedGridPattern from "@/components/ui/animated-grid-pattern";
 import { signIn } from "next-auth/react"; // Ensure this import is present
-
+import Image from "next/image";
 // Example user data for demonstration purposes
 const users: { id: number; name: string; email: string; password: string; image: string }[] = []; // This will hold the registered users
 
@@ -59,7 +59,16 @@ export default function SignUpPage() {
         className="inset-x-0 inset-y-[-30%] h-[130%] skew-y-12"
       />
       <div className="w-full relative max-w-[400px] !font-sans space-y-6 bg-white/80 shadow-lg rounded-3xl p-6">
-        <div className="text-center space-y-2">
+        <div className="flex flex-col items-center text-center space-y-2">
+        <div className="relative flex justify-center m-1  w-[5rem] h-[5rem] items-center ">
+            {/* Adjust width and height as needed */}
+            <Image
+              src="/cry_p.png" // Replace with the path to your logo in the public folder
+              alt="Website Logo" // Provide a description for accessibility
+              layout="fill" // This makes the image fill the parent container
+              className="object-contain  w-auto justify-center self-center p-0  items-center shadow-black shadow-md flex rounded-full" // This ensures the image maintains its aspect ratio
+            />
+          </div>
           <h1 className="text-2xl font-semibold font-sans tracking-tight text-gray-800">
             Create an Account
           </h1>

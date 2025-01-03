@@ -1,5 +1,5 @@
 "use client";
-
+import Image from "next/image";
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -56,7 +56,17 @@ export default function LoginPage() {
         style={{ fontFamily: "sans-serif" }}
         className="w-full relative max-w-[400px] !font-sans  space-y-6  bg-white/90  shadow-xl bg-blur-xl    rounded-3xl p-6"
       >
-        <div className="text-center  space-y-2">
+        <div className="text-center flex flex-col items-center justify-center  space-y-2">
+          <div className="relative flex justify-center  w-[5rem] h-[5rem] items-center ">
+            {/* Adjust width and height as needed */}
+            <Image
+              src="/cry_p.png" // Replace with the path to your logo in the public folder
+              alt="Website Logo" // Provide a description for accessibility
+              layout="fill" // This makes the image fill the parent container
+              className="object-contain w-auto justify-center self-center p-0  items-center shadow-black shadow-md flex rounded-full" // This ensures the image maintains its aspect ratio
+            />
+          </div>
+
           <h1 className="text-2xl font-semibold font-sans tracking-tight text-gray-800">
             Welcome back
           </h1>
@@ -169,13 +179,12 @@ export default function LoginPage() {
         </div>
 
         <div className="text-center text-sm">
-        <Link
-  href="/signup"
-  className="text-gray-500 font-semibold font-sans hover:text-gray-900"
->
-  Don&apos;t have an account yet? Sign Up
-</Link>
-
+          <Link
+            href="/signup"
+            className="text-gray-500 font-semibold font-sans hover:text-gray-900"
+          >
+            Don&apos;t have an account yet? Sign Up
+          </Link>
         </div>
       </div>
     </div>

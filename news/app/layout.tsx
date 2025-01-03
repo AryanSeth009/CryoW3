@@ -18,7 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-      <link rel="icon" href="/ico2.jpg" sizes="180x180"/>
+      <link rel="icon" href="/BlackLogo.png" className="rounded-full" sizes="360x360"/>
 
         <script
           async

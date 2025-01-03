@@ -8,9 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import InteractiveHoverButton from "@/components/ui/interactive-hover-button";
 import { useRouter } from "next/navigation";
-import  { PulsatingButton} from "@/components/ui/pulsating-button"; 
+import { PulsatingButton } from "@/components/ui/pulsating-button";
 import { RainbowButton } from "@/components/ui/rainbow-button";
-
 import {
   CryptoIcon,
   ChevronIcon,
@@ -22,7 +21,7 @@ import {
 } from "@/components/ui/icons";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect,useCallback, useState } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { Bell, BellIcon, Menu, X, ChevronUp } from "lucide-react";
 import Newsletter from "@/components/NewsFooter/Newsletter";
 import Footer from "@/components/NewsFooter/Footer";
@@ -196,13 +195,13 @@ export default function NewsPage() {
   const router = useRouter();
 
   const handleLogin = () => {
-    router.push('/login')
+    router.push("/login");
     // Implement your login logic here
-  setIsLoggedIn(true); // Set to true when user logs in
+    setIsLoggedIn(true); // Set to true when user logs in
   };
   const handleSignup = () => {
-   router.push('/signup')
-  }
+    router.push("/signup");
+  };
 
   const handleLogout = () => {
     // Implement your logout logic here
@@ -306,110 +305,120 @@ export default function NewsPage() {
     const API_KEY = process.env.NEXT_PUBLIC_NEWS_API_KEY;
 
     try {
-      setLoading(false);
+      setLoading(true); // Make sure it's true at the start
       const response = await fetch(
         `https://newsapi.org/v2/everything?q=${query}&sortBy=publishedAt&apiKey=${API_KEY}&pageSize=24`
       );
 
       if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Error fetching news:", errorData); // Log error data
         throw new Error("Failed to fetch news");
       }
 
       const data = await response.json();
       setNews(data.articles);
       setError(null);
+    } catch (error) {
+      console.error(error); // Log the actual error
+      setError(error.message); // Show the error message
     } finally {
       setLoading(false);
     }
   };
 
   // Refactor fetchYouTubeVideos with useCallback
-  const fetchYouTubeVideos = useCallback(async (query: string) => {
-    try {
-      setYoutubeLoading(true);
-      const response = await fetch(
-        `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=9&q=${encodeURIComponent(
-          query
-        )}&type=video&key=${YOUTUBE_API_KEY}`
-      );
-
-      if (!response.ok) {
-        console.error(
-          `YouTube API request failed with status: ${response.status}`
+  const fetchYouTubeVideos = useCallback(
+    async (query: string) => {
+      try {
+        setYoutubeLoading(true);
+        const response = await fetch(
+          `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=9&q=${encodeURIComponent(
+            query
+          )}&type=video&key=${YOUTUBE_API_KEY}`
         );
-        setYoutubeError("Failed to fetch YouTube videos. Please try again.");
-        return;
-      }
 
-      const data = await response.json();
-      setYoutubeVideos(data.items);
-      setYoutubeError(null);
-    } catch (error) {
-      console.error("Error fetching YouTube videos:", error);
-      setYoutubeError("Failed to fetch YouTube videos. Please try again.");
-    } finally {
-      setYoutubeLoading(false);
-    }
-  }, [YOUTUBE_API_KEY]);
+        if (!response.ok) {
+          console.error(
+            `YouTube API request failed with status: ${response.status}`
+          );
+          setYoutubeError("Failed to fetch YouTube videos. Please try again.");
+          return;
+        }
+
+        const data = await response.json();
+        setYoutubeVideos(data.items);
+        setYoutubeError(null);
+      } catch (error) {
+        console.error("Error fetching YouTube videos:", error);
+        setYoutubeError("Failed to fetch YouTube videos. Please try again.");
+      } finally {
+        setYoutubeLoading(false);
+      }
+    },
+    [YOUTUBE_API_KEY]
+  );
 
   // Example useEffect to fetch videos
- 
 
   const fetchRSSFeeds = async () => {
     try {
       setRssLoading(true);
-  
+
       const feeds = [
         "https://www.newsbtc.com/feed/",
         "https://bitcoinmagazine.com/.rss/full/",
         "https://cryptopotato.com/feed/",
       ];
-  
+
       const responses = await Promise.allSettled(
         feeds.map((feed) =>
           fetch(
-            `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feed)}`
+            `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(
+              feed
+            )}`
           )
         )
       );
-  
+
       const data = await Promise.all(
         responses
           .filter((response) => response.status === "fulfilled")
           .map((response: any) => response.value.json())
       );
-  
-      const transformedArticles = data.flatMap((feed) =>
-        feed.items?.map((item: any) => ({
-          title: item.title || "No title available",
-          description: item.description || "No description available",
-          url: item.link || "#",
-          urlToImage: item.thumbnail || item.enclosure?.link || "",
-          source: {
-            name: feed.feed?.title || "Unknown Source",
-            icon: feed.feed?.favicon || "",
-          },
-          publishedAt: item.pubDate || new Date().toISOString(),
-        })) || []
+
+      const transformedArticles = data.flatMap(
+        (feed) =>
+          feed.items?.map((item: any) => ({
+            title: item.title || "No title available",
+            description: item.description || "No description available",
+            url: item.link || "#",
+            urlToImage: item.thumbnail || item.enclosure?.link || "",
+            source: {
+              name: feed.feed?.title || "Unknown Source",
+              icon: feed.feed?.favicon || "",
+            },
+            publishedAt: item.pubDate || new Date().toISOString(),
+          })) || []
       );
-  
+
       const sortedArticles = transformedArticles
         .sort(
           (a, b) =>
-            new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+            new Date(b.publishedAt).getTime() -
+            new Date(a.publishedAt).getTime()
         )
         .slice(0, 9);
-  
+
       setRssNews(sortedArticles);
       setError(null);
     } catch (err) {
-      console.error("RSS Feed Error:",  err);
+      console.error("RSS Feed Error:", err);
       setError("Failed to fetch RSS feeds. Please try again.");
     } finally {
       setRssLoading(false);
     }
   };
-  
 
   // const fetchTwitterPosts = async (
   //   query: string,
@@ -611,6 +620,7 @@ export default function NewsPage() {
       <div className="absolute right-0 top-0 bottom-0 w-64 bg-gray-800 p-6 shadow-xl">
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-xl font-bold text-purple-500">Menu</h2>
+
           <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>
             <X className="h-6 w-6" />
           </Button>
@@ -704,7 +714,14 @@ export default function NewsPage() {
       <nav className="sticky top-0 z-50 bg-gray-900/90 backdrop-blur-xl border-b border-gray-800 shadow-lg p-4">
         <div className="container mx-auto flex items-center justify-between">
           {/* <img src="./ico3.png" alt="" className="h-14 w-32  " /> */}
-          <h1 className="text-2xl font-bold text-purple-500">CryoW3Times</h1>
+          <div className="flex">
+            <Image
+              src="/ic_m.png " // Replace with your image URL
+              alt="Description of the image" // Provide a description for accessibility
+              layout="fill" // This makes the image fill the parent container
+              className=" !w-[11rem] p-2" // This ensures the image covers the area without distortion
+            />
+          </div>
           <div className="hidden md:flex items-center space-x-6">
             {["Crypto News", "NFTs", "Market Updates", "Web3", "DeFi"].map(
               (item) => (
@@ -740,12 +757,15 @@ export default function NewsPage() {
             ) : (
               <div className="flex space-x-0 ">
                 {/*sign in */}
-                <Button onClick={handleLogin} className="text-md items-center text-[16px] text-center cursor-pointer  rounded-full font-sans p-6 w-24 font-semibold align-middle !bg-transparent">
-                Sign In
-              </Button>
-               { /*sign up */}
-               <InteractiveHoverButton />
-               {/* <button className="" onClick={handleSignup}> <InteractiveHoverButton /></button> */}
+                <Button
+                  onClick={handleLogin}
+                  className="text-md items-center text-[16px] text-center cursor-pointer  rounded-full font-sans p-6 w-24 font-semibold align-middle !bg-transparent"
+                >
+                  Sign In
+                </Button>
+                {/*sign up */}
+                <InteractiveHoverButton />
+                {/* <button className="" onClick={handleSignup}> <InteractiveHoverButton /></button> */}
               </div>
             )}
 
