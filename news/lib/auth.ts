@@ -1,9 +1,9 @@
-import { MongoDBAdapter } from "@auth/mongodb-adapter"
-import { NextAuthOptions } from "next-auth"
-import clientPromise from "@/lib/db"
-import GoogleProvider from "next-auth/providers/google"
-import CredentialsProvider from "next-auth/providers/credentials"
-import bcrypt from "bcryptjs"
+import { MongoDBAdapter } from "@auth/mongodb-adapter";
+import { NextAuthOptions } from "next-auth";
+import clientPromise from "@/lib/db";
+import GoogleProvider from "next-auth/providers/google";
+import CredentialsProvider from "next-auth/providers/credentials";
+import bcrypt from "bcryptjs";
 
 export const authOptions: NextAuthOptions = {
   adapter: MongoDBAdapter(clientPromise),
@@ -13,38 +13,26 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
     CredentialsProvider({
-      name: "credentials",
+      name: "Credentials",
       credentials: {
         email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" }
+        password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          throw new Error("Invalid credentials")
+          throw new Error("Please provide both email and password");
         }
 
-        const user = await prisma.user.findUnique({
-          where: {
-            email: credentials.email
-          }
-        })
+        const db = (await clientPromise).db();
+        const user = await db.collection("users").findOne({ email: credentials.email });
 
-        if (!user || !user?.password) {
-          throw new Error("Invalid credentials")
+        if (!user || !(await bcrypt.compare(credentials.password, user.password))) {
+          throw new Error("Invalid email or password");
         }
 
-        const isCorrectPassword = await bcrypt.compare(
-          credentials.password,
-          user.password
-        )
-
-        if (!isCorrectPassword) {
-          throw new Error("Invalid credentials")
-        }
-
-        return user
-      }
-    })
+        return { id: user._id.toString(), email: user.email };
+      },
+    }),
   ],
   pages: {
     signIn: "/login",
@@ -52,5 +40,4 @@ export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
   },
-}
-
+};
