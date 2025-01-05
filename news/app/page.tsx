@@ -22,7 +22,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useCallback, useState } from "react";
-import { Bell, BellIcon, Menu, X, ChevronUp } from "lucide-react";
+import { Bell, BellIcon, Menu, X, ChevronUp, Search } from "lucide-react";
 import Newsletter from "@/components/NewsFooter/Newsletter";
 import Footer from "@/components/NewsFooter/Footer";
 import RippleButton from "@/components/ui/ripple-button";
@@ -141,12 +141,10 @@ if (typeof window !== "undefined") {
 }
 
 export default function NewsPage() {
-  const [news, setNews] = useState<NewsArticle[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const itemsPerPage = 6;
+
   const [youtubeVideos, setYoutubeVideos] = useState<
     {
       id: { videoId: string };
@@ -263,17 +261,8 @@ export default function NewsPage() {
   const YOUTUBE_API_KEY =
     process.env.NEXT_PUBLIC_YOUTUBE_API_KEY || "YOUR_YOUTUBE_API_KEY";
 
-  const next = () => {
-    if (currentIndex + itemsPerPage < news.length) {
-      setCurrentIndex(currentIndex + itemsPerPage);
-    }
-  };
 
-  const prev = () => {
-    if (currentIndex - itemsPerPage >= 0) {
-      setCurrentIndex(currentIndex - itemsPerPage);
-    }
-  };
+
 
   const fetchRedditNews = async (
     afterToken: string | null = null,
@@ -300,35 +289,8 @@ export default function NewsPage() {
     }
   };
 
-  const fetchNews = async (query: string) => {
-    const API_KEY = process.env.NEXT_PUBLIC_NEWS_API_KEY;
 
-    try {
-      setLoading(true); // Make sure it's true at the start
-      const response = await fetch(
-        `https://newsapi.org/v2/everything?q=${query}&sortBy=publishedAt&apiKey=${API_KEY}&pageSize=24`
-      );
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Error fetching news:", errorData); // Log error data
-        // throw new Error("Failed to fetch news");
-      }
-
-      const data = await response.json();
-      setNews(data.articles);
-      setError(null);
-    } catch (error) {
-      console.error(error); // Log the actual error
-      if (error instanceof Error) {
-        setError(error.message); // Show the error message
-      } else {
-        setError("An unknown error occurred"); // Fallback for unknown error types
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // Refactor fetchYouTubeVideos with useCallback
   const fetchYouTubeVideos = useCallback(
@@ -583,11 +545,11 @@ export default function NewsPage() {
     const defaultQuery = "cryptocurrency news";
     setSearchTerm(defaultQuery);
     fetchGNews(defaultQuery);
-    fetchNews(defaultQuery);
     fetchYouTubeVideos(defaultQuery);
     fetchRedditNews(null, defaultQuery);
     fetchRSSFeeds();
   }, []);
+
 
   const LoadingSkeleton = () => (
     <div className="space-y-8 animate-pulse">
@@ -713,84 +675,162 @@ export default function NewsPage() {
           <div className="absolute top-0 right-0 w-1/2 h-full bg-[linear-gradient(45deg,transparent_25%,rgba(123,97,255,0.1)_25%,rgba(123,97,255,0.1)_35%,transparent_35%)]" />
         </div>
       </div>
-      <nav className="sticky top-0 z-50 bg-gray-900/90 backdrop-blur-xl border-b border-gray-800 shadow-lg p-4">
-        <div className="container mx-auto flex items-center justify-between">
-          {/* <img src="./ico3.png" alt="" className="h-14 w-32  " /> */}
-          <div className="flex">
+        <nav className="sticky top-0  p-1 z-50 bg-gray-900/90 backdrop-blur-xl border-b border-gray-800 shadow-lg">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between h-16">
+          {/* Logo */}
+          <div className="flex-shrink-0 relative w-[11rem] h-auto">
             <Image
-              src="/ic_m.png" // Removed the trailing space
-              alt="Description of the image" // Keep the alt text for accessibility
-              fill // This replaces the "layout='fill'" functionality
-              className="!w-[11rem] p-2" // Adjust styles if needed
+            src="/ic_m.png"
+            alt="Logo"
+            width={120}
+            height={40}
+            className="object-contain"
+            priority
             />
           </div>
+
+          {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
             {["Crypto News", "NFTs", "Market Updates", "Web3", "DeFi"].map(
-              (item) => (
-                <button
-                  key={item}
-                  onClick={() => handleNavbarSearch(item)}
-                  className="text-gray-300 hover:text-purple-500 font-medium transition-colors"
-                >
-                  {item}
-                </button>
-              )
+            (item) => (
+              <button
+              key={item}
+              onClick={() => handleNavbarSearch(item)}
+              className="text-gray-300 hover:text-purple-500 font-medium transition-colors"
+              >
+              {item}
+              </button>
+            )
             )}
           </div>
+
+          {/* Right side items */}
           <div className="flex items-center space-x-4">
+            {/* Search bar - desktop */}
+            <div className="hidden md:flex relative">
+            <Input
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+              placeholder="Search..."
+              className="pl-10 h-10 w-64 rounded-full bg-gray-800 border-gray-700 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 text-white placeholder:text-gray-400"
+            />
+            <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            </div>
+
+            <Button
+            variant="ghost"
+            size="icon"
+            className="relative text-gray-300 hover:text-purple-500"
+            >
+            <Bell className="h-5 w-5" />
+            <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-purple-500 text-[10px] font-medium text-white flex items-center justify-center">
+              3
+            </span>
+            </Button>
+
+            {/* Auth buttons - desktop */}
+            <div className="hidden md:flex items-center space-x-2">
+            {isLoggedIn ? (
+              <Avatar className="h-8 w-8">
+              <AvatarImage src="https://github.com/shadcn.png" alt="Profile" />
+              <AvatarFallback>CN</AvatarFallback>
+              </Avatar>
+            ) : (
+              <div className="flex space-x-2">
+              <Button
+                onClick={handleLogin}
+                className="text-white font-[20px] hover:text-purple-400 font-sans !bg-transparent"
+              >
+                Sign In
+              </Button>
+              <InteractiveHoverButton />
+              </div>
+            )}
+            </div>
+
+            {/* Mobile menu button */}
+            <Button
+            variant="ghost"
+            className="md:hidden"
+            onClick={() => setMobileMenuOpen(true)}
+            >
+            <Menu className="h-6 w-6" />
+            </Button>
+          </div>
+          </div>
+        </div>
+
+        {/* Mobile menu overlay */}
+        {mobileMenuOpen && (
+          <div className="fixed inset-0 z-50 bg-gray-900/90 backdrop-blur-xl md:hidden">
+          <div className="fixed inset-y-0 right-0 w-full max-w-sm bg-gray-900 shadow-xl">
+            <div className="flex items-center justify-between p-4 border-b border-gray-800">
+            <h2 className="text-lg font-semibold text-gray-100">Menu</h2>
             <Button
               variant="ghost"
               size="icon"
-              className="relative text-gray-300 hover:text-purple-500"
+              onClick={() => setMobileMenuOpen(false)}
             >
-              <Bell className="h-5 w-5" />
-              <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-purple-500 text-[10px] font-medium text-white flex items-center justify-center">
-                3
-              </span>
+              <X className="h-6 w-6" />
             </Button>
-            {isLoggedIn ? (
-              <Avatar className="h-8 w-8">
-                <AvatarImage
-                  src="https://github.com/shadcn.png"
-                  alt="Profile"
-                />
-                <AvatarFallback>CN</AvatarFallback>
-              </Avatar>
-            ) : (
-              <div className="flex space-x-0 ">
-                {/*sign in */}
-                <Button
-                  onClick={handleLogin}
-                  className="text-md items-center text-[16px] text-center cursor-pointer  rounded-full font-sans p-6 w-24 font-semibold align-middle !bg-transparent"
-                >
-                  Sign In
-                </Button>
-                {/*sign up */}
-                <InteractiveHoverButton />
-                {/* <button className="" onClick={handleSignup}> <InteractiveHoverButton /></button> */}
+            </div>
+            
+            {/* Mobile Search */}
+            <div className="p-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Input
+              placeholder="Search..."
+              className="pl-10 h-10 w-full rounded-full bg-gray-800 border-gray-700 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 text-white placeholder:text-gray-400"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                handleSearch();
+                setMobileMenuOpen(false);
+                }
+              }}
+              />
+            </div>
+            </div>
+
+            {/* Mobile Navigation Items */}
+            <div className="px-4 py-6 space-y-6">
+            {["Crypto News", "NFTs", "Market Updates", "Web3", "DeFi"].map(
+              (item) => (
+              <button
+                key={item}
+                onClick={() => {
+                handleNavbarSearch(item);
+                setMobileMenuOpen(false);
+                }}
+                className="block w-full text-left px-4 py-2 text-gray-300 hover:text-purple-500 hover:bg-gray-800 rounded-lg transition-colors"
+              >
+                {item}
+              </button>
+              )
+            )}
+            {!isLoggedIn && (
+              <div className="pt-6 border-gray-800">
+              <Button
+                onClick={handleLogin}
+                className="w-full mb-3"
+                variant="outline"
+              >
+                Sign In
+              </Button>
+              <Button onClick={handleSignup} className="w-full">
+                Sign Up
+              </Button>
               </div>
             )}
-
-            <div className="relative md:block hidden">
-              <Input
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                placeholder="Search..."
-                className="pl-10 h-10 w-64 rounded-full bg-gray-800 border-gray-700 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 text-white placeholder:text-gray-400"
-              />
-              <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             </div>
-            <Button
-              variant="ghost"
-              className="md:hidden"
-              onClick={() => setMobileMenuOpen(true)}
-            >
-              <Menu className="h-6 w-6" />
-            </Button>
           </div>
-        </div>
-      </nav>
+          </div>
+        )}
+        </nav>
 
       <main className="container mx-auto p-8 px-4 py-4">
 

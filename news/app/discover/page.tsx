@@ -69,12 +69,11 @@ interface YouTubeVideo {
 
 const getValidImageUrl = (url: string | undefined): string => {
   if (!url) return DEFAULT_FALLBACK_IMAGE;
-  if (url.startsWith('http://') || url.startsWith('https://')) return url;
-  if (url === 'self' || url === 'default') return DEFAULT_FALLBACK_IMAGE;
-  if (url.startsWith('/')) return url;
+  if (url.startsWith("http://") || url.startsWith("https://")) return url;
+  if (url === "self" || url === "default") return DEFAULT_FALLBACK_IMAGE;
+  if (url.startsWith("/")) return url;
   return DEFAULT_FALLBACK_IMAGE;
 };
-
 
 // Add the styles to your Tailwind config if not already present
 if (typeof window !== "undefined") {
@@ -150,23 +149,16 @@ if (typeof window !== "undefined") {
   document.head.appendChild(style);
 }
 
-const categories = [
-  "All",
-  "Crypto",
-  
- 
-  "Finance",
-  "Markets",
-  "NFTs",
-  "Web3",
-];
+const categories = ["All", "Crypto", "Finance", "Markets", "NFTs", "Web3"];
 
 // Add function to filter news based on category
 const getFilteredNews = (news: any[], category: string) => {
   if (category === "All") return news;
-  
+
   return news.filter((item) => {
-    const searchableText = `${item.title} ${item.description || ''} ${item.source.name}`.toLowerCase();
+    const searchableText = `${item.title} ${item.description || ""} ${
+      item.source.name
+    }`.toLowerCase();
     return searchableText.includes(category.toLowerCase());
   });
 };
@@ -398,28 +390,28 @@ export default function DiscoverView() {
 
   // Combine all news sources
   const allNews = [
-    ...rssNews.map((item) => ({ 
-      ...item, 
+    ...rssNews.map((item) => ({
+      ...item,
       type: "rss",
-      urlToImage: getValidImageUrl(item.urlToImage)
+      urlToImage: getValidImageUrl(item.urlToImage),
     })),
-    ...redditNews.map((item) => ({ 
-      ...item, 
+    ...redditNews.map((item) => ({
+      ...item,
       type: "reddit",
-      urlToImage: getValidImageUrl(item.urlToImage)
+      urlToImage: getValidImageUrl(item.urlToImage),
     })),
-    ...gNews.map((item) => ({ 
-      ...item, 
+    ...gNews.map((item) => ({
+      ...item,
       type: "gnews",
-      urlToImage: getValidImageUrl(item.urlToImage)
+      urlToImage: getValidImageUrl(item.urlToImage),
     })),
     ...youtubeVideos.map((video) => ({
       title: video.snippet.title,
       url: `https://www.youtube.com/watch?v=${video.id.videoId}`,
       urlToImage: getValidImageUrl(video.snippet.thumbnails.medium.url),
-      source: { 
+      source: {
         name: video.snippet.channelTitle,
-        icon: DEFAULT_FALLBACK_IMAGE
+        icon: DEFAULT_FALLBACK_IMAGE,
       },
       type: "youtube",
       publishedAt: new Date().toISOString(),
@@ -656,6 +648,14 @@ export default function DiscoverView() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0D0B12] to-[#1A1625] text-gray-100">
       {/* Header */}
+      <div className="fixed p-4  inset-0 z-0 select-none pointer-events-none">
+        <div className="absolute top-0 right-0 w-full h-full">
+          {/* Purple gradient lines */}
+          <div className="absolute top-0 right-0 w-1/2 h-full bg-[linear-gradient(45deg,transparent_45%,rgba(123,97,255,0.1)_45%,rgba(123,97,255,0.1)_55%,transparent_55%)]" />
+          <div className="absolute top-0 right-0 w-1/2 h-full bg-[linear-gradient(45deg,transparent_35%,rgba(123,97,255,0.1)_35%,rgba(123,97,255,0.1)_45%,transparent_45%)]" />
+          <div className="absolute top-0 right-0 w-1/2 h-full bg-[linear-gradient(45deg,transparent_25%,rgba(123,97,255,0.1)_25%,rgba(123,97,255,0.1)_35%,transparent_35%)]" />
+        </div>
+      </div>
       <nav className="sticky  top-0 z-50 bg-gray-900/90 backdrop-blur-xl border-b border-gray-800 shadow-lg">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
@@ -702,7 +702,10 @@ export default function DiscoverView() {
               <div className="hidden md:flex items-center space-x-2">
                 {isLoggedIn ? (
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src="https://github.com/shadcn.png" alt="Profile" />
+                    <AvatarImage
+                      src="https://github.com/shadcn.png"
+                      alt="Profile"
+                    />
                     <AvatarFallback>CN</AvatarFallback>
                   </Avatar>
                 ) : (
@@ -803,34 +806,34 @@ export default function DiscoverView() {
         {/* Categories */}
         <div className="flex overflow-x-auto space-x-2 pb-2 scrollbar-hide">
           {categories.map((category) => (
-          <Button
-            key={category}
-            variant={activeCategory === category ? "default" : "outline"}
-            className="flex-shrink-0 rounded-full"
-            onClick={() => {
-            setActiveCategory(category);
-            if (category !== "All") {
-              fetchGNews(category);
-              fetchYouTubeVideos(category);
-              fetchRedditNews(null, category);
-              fetchRSSFeeds();
-            } else {
-              const defaultQuery = "cryptocurrency news";
-              fetchGNews(defaultQuery);
-              fetchYouTubeVideos(defaultQuery);
-              fetchRedditNews(null, defaultQuery);
-              fetchRSSFeeds();
-            }
-            }}
-          >
-            {category}
-          </Button>
+            <Button
+              key={category}
+              variant={activeCategory === category ? "default" : "outline"}
+              className="flex-shrink-0 rounded-full"
+              onClick={() => {
+                setActiveCategory(category);
+                if (category !== "All") {
+                  fetchGNews(category);
+                  fetchYouTubeVideos(category);
+                  fetchRedditNews(null, category);
+                  fetchRSSFeeds();
+                } else {
+                  const defaultQuery = "cryptocurrency news";
+                  fetchGNews(defaultQuery);
+                  fetchYouTubeVideos(defaultQuery);
+                  fetchRedditNews(null, defaultQuery);
+                  fetchRSSFeeds();
+                }
+              }}
+            >
+              {category}
+            </Button>
           ))}
         </div>
       </div>
 
       {/* Combined News Feed */}
-        <div className="px-4 space-y-4 pb-8">
+      <div className="px-4 space-y-4 pb-8">
         {getFilteredNews(allNews, activeCategory).map((item, index) => (
           <Link
             key={index}
@@ -839,7 +842,7 @@ export default function DiscoverView() {
             rel="noopener noreferrer"
             className="block"
           >
-            <Card className="flex gap-4 bg-[#1A1625] border-none overflow-hidden hover:bg-[#231d30] transition-colors">
+            <Card className="flex gap-4 rounded-xl  bg-[#1A1625] border-none overflow-hidden hover:bg-[#231d30] transition-colors">
               <div className="relative w-24 h-24 flex-shrink-0">
                 <Image
                   src={item.urlToImage || DEFAULT_FALLBACK_IMAGE}
@@ -850,38 +853,37 @@ export default function DiscoverView() {
               </div>
               <div className="flex-1 p-3">
                 <div className="flex items-center gap-2 mb-2">
-                    <Badge
+                  <Badge
                     variant="outline"
                     className={`
                     ${
                       item.type === "youtube"
-                      ? "text-red-500 border-red-500/30 bg-red-500/5"
-                      : ""
+                        ? "text-red-500 border-red-500/30 bg-red-500/5"
+                        : ""
                     }
                     ${
                       item.type === "reddit"
-                      ? "text-orange-500 border-orange-500/30 bg-orange-500/5"
-                      : ""
+                        ? "text-orange-500 border-orange-500/30 bg-orange-500/5"
+                        : ""
                     }
                     ${
                       item.type === "rss"
-                      ? "text-blue-500 border-blue-500/30 bg-blue-500/5"
-                      : ""
+                        ? "text-blue-500 border-blue-500/30 bg-blue-500/5"
+                        : ""
                     }
                     ${
                       item.type === "gnews"
-                      ? "text-purple-500 border-purple-500/30 bg-purple-500/5"
-                      : ""
+                        ? "text-purple-500 border-purple-500/30 bg-purple-500/5"
+                        : ""
                     }
-                    `}
-                    >
+                  `}
+                  >
                     {item.source.name}
-                    </Badge>
-                  </div>
-                  <h3 className="text-sm font-medium line-clamp-2 mb-2 text-gray-100">
-                    {item.title}
-                  </h3>
-
+                  </Badge>
+                </div>
+                <h3 className="text-sm font-medium line-clamp-2 mb-2 text-gray-100">
+                  {item.title}
+                </h3>
                 <div className="flex items-center gap-2 text-xs text-gray-400">
                   <Avatar className="w-4 h-4">
                     <AvatarImage
