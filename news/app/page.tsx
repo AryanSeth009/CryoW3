@@ -919,7 +919,7 @@ export default function NewsPage() {
           </div>
         </div>
 
-        <div className="grid p-8 lg:grid-cols-[1fr_400px] gap-12">
+        <div className="hidden md:grid p-8 lg:grid-cols-[1fr_400px] gap-12">
           <div>
             {loading ? (
               <LoadingSkeleton />
@@ -930,8 +930,8 @@ export default function NewsPage() {
             ) : (
               <>
                 {redditNews.length === 0 &&
-                  youtubeVideos.length === 0 &&
-                  rssNews.length === 0 ? (
+                youtubeVideos.length === 0 &&
+                rssNews.length === 0 ? (
                   <div className="text-center py-10">
                     <p className="text-xl text-gray-400">
                       No news available. Please try refreshing the page.
@@ -1024,7 +1024,8 @@ export default function NewsPage() {
                               onClick={() =>
                                 prevPageToken &&
                                 fetchYouTubeVideos(
-                                  `${searchTerm || "cryptocurrency"
+                                  `${
+                                    searchTerm || "cryptocurrency"
                                   } ${prevPageToken}`
                                 )
                               }
@@ -1039,7 +1040,8 @@ export default function NewsPage() {
                               onClick={() =>
                                 nextPageToken &&
                                 fetchYouTubeVideos(
-                                  `${searchTerm || "cryptocurrency"
+                                  `${
+                                    searchTerm || "cryptocurrency"
                                   } ${nextPageToken}`
                                 )
                               }
@@ -1234,7 +1236,7 @@ export default function NewsPage() {
                                 <Image
                                   src={
                                     article.urlToImage &&
-                                      article.urlToImage.startsWith("http")
+                                    article.urlToImage.startsWith("http")
                                       ? article.urlToImage
                                       : DEFAULT_FALLBACK_IMAGE
                                   }
@@ -1470,8 +1472,8 @@ export default function NewsPage() {
                       <Image
                         src={
                           article.urlToImage &&
-                            (article.urlToImage.startsWith("http") ||
-                              article.urlToImage.startsWith("/"))
+                          (article.urlToImage.startsWith("http") ||
+                            article.urlToImage.startsWith("/"))
                             ? article.urlToImage
                             : DEFAULT_FALLBACK_IMAGE
                         }
