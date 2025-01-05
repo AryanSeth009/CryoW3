@@ -313,7 +313,7 @@ export default function NewsPage() {
       if (!response.ok) {
         const errorData = await response.json();
         console.error("Error fetching news:", errorData); // Log error data
-        throw new Error("Failed to fetch news");
+        // throw new Error("Failed to fetch news");
       }
 
       const data = await response.json();
@@ -720,10 +720,10 @@ export default function NewsPage() {
           {/* <img src="./ico3.png" alt="" className="h-14 w-32  " /> */}
           <div className="flex">
             <Image
-              src="/ic_m.png " // Replace with your image URL
-              alt="Description of the image" // Provide a description for accessibility
-              layout="fill" // This makes the image fill the parent container
-              className=" !w-[11rem] p-2" // This ensures the image covers the area without distortion
+              src="/ic_m.png" // Removed the trailing space
+              alt="Description of the image" // Keep the alt text for accessibility
+              fill // This replaces the "layout='fill'" functionality
+              className="!w-[11rem] p-2" // Adjust styles if needed
             />
           </div>
           <div className="hidden md:flex items-center space-x-6">
