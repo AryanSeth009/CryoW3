@@ -795,6 +795,92 @@ export default function NewsPage() {
       </nav>
 
       <main className="container mx-auto p-8 px-4 py-4">
+   
+        {/* Mobile Breaking News Section */}
+        <div className="md:hidden mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold">Breaking News</h2>
+            <Link href="#" className="text-sm text-purple-500">
+              View all
+            </Link>
+          </div>
+          
+          <div className="relative">
+            <div className="overflow-x-auto snap-x snap-mandatory scrollbar-hide">
+              <div className="flex space-x-4">
+                {rssNews.slice(0, 3).map((article, index) => (
+                  <div key={index} className="snap-center w-[85vw] flex-shrink-0">
+                    <div className="relative h-48 rounded-xl overflow-hidden">
+                      <Image
+                        src={article.urlToImage || DEFAULT_FALLBACK_IMAGE}
+                        alt={article.title}
+                        fill
+                        className="object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                      <div className="absolute bottom-0 p-4 w-full">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge className="bg-blue-500">{article.source.name}</Badge>
+                          <span className="text-xs text-gray-300">6 hours ago</span>
+                        </div>
+                        <h3 className="text-white font-medium line-clamp-2">
+                          {article.title}
+                        </h3>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Recommendations Section */}
+        <div className="md:hidden mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold">Recommendation</h2>
+            <Link href="/discover" className="text-sm text-purple-500">
+  View all
+</Link>
+
+          </div>
+          <div className="space-y-4">
+            {[...rssNews, ...redditNews].slice(0, 5).map((article, index) => (
+              <Link
+                key={index}
+                href={article.url}
+                className="flex gap-4 items-center p-2 rounded-xl bg-gray-900/50"
+              >
+                <div className="relative w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
+                  <Image
+                    src={article.urlToImage || DEFAULT_FALLBACK_IMAGE}
+                    alt={article.title}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <div className="flex-1">
+                  <Badge variant="outline" className="mb-2 text-purple-500 border-purple-500/30 bg-purple-500/5">
+                    {article.source.name}
+                  </Badge>
+                  <h3 className="text-sm font-medium line-clamp-2 mb-1">
+                    {article.title}
+                  </h3>
+                  <div className="flex items-center gap-2">
+                    <Avatar className="w-5 h-5">
+                      <AvatarImage src="/placeholder-user.jpg" />
+                      <AvatarFallback>U</AvatarFallback>
+                    </Avatar>
+                    <span className="text-xs text-gray-400">
+                      {new Date(article.publishedAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+
         <div className="grid p-8 lg:grid-cols-[1fr_400px] gap-12">
           <div>
             {loading ? (
@@ -1393,6 +1479,15 @@ export default function NewsPage() {
         handleNavbarSearch={handleNavbarSearch}
       />
       <ScrollToTopButton />
+      <style jsx>{`
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
     </div>
   );
 }
