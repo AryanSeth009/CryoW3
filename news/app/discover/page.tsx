@@ -156,9 +156,8 @@ const getFilteredNews = (news: any[], category: string) => {
   if (category === "All") return news;
 
   return news.filter((item) => {
-    const searchableText = `${item.title} ${item.description || ""} ${
-      item.source.name
-    }`.toLowerCase();
+    const searchableText = `${item.title} ${item.description || ""} ${item.source.name
+      }`.toLowerCase();
     return searchableText.includes(category.toLowerCase());
   });
 };
@@ -306,8 +305,7 @@ export default function DiscoverView() {
   ) => {
     try {
       const redditResponse = await fetch(
-        `https://www.reddit.com/r/CryptoCurrency/search.json?q=${query}&sort=top&limit=9${
-          afterToken ? `&after=${afterToken}` : ""
+        `https://www.reddit.com/r/CryptoCurrency/search.json?q=${query}&sort=top&limit=9${afterToken ? `&after=${afterToken}` : ""
         }`
       );
       const redditData = await redditResponse.json();
@@ -387,6 +385,62 @@ export default function DiscoverView() {
     },
     [YOUTUBE_API_KEY]
   );
+  const MobileMenu = ({
+    isOpen,
+    setIsOpen,
+    handleNavbarSearch,
+  }: {
+    isOpen: boolean;
+    setIsOpen: (isOpen: boolean) => void;
+    handleNavbarSearch: (query: string) => void;
+  }) => (
+    <div className={`fixed inset-0 z-50 ${isOpen ? "block" : "hidden"}`}>
+      <div
+        className="absolute inset-0 bg-gray-900/50 backdrop-blur-sm"
+        onClick={() => setIsOpen(false)}
+      />
+      <div className="absolute right-0 top-0 bottom-0 w-64 bg-gray-800 p-6 shadow-xl">
+        <div className="flex justify-between items-center mb-8">
+          <h2 className="text-xl font-bold text-purple-500">Menu</h2>
+
+          <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>
+            <X className="h-6 w-6" />
+          </Button>
+        </div>
+        <div className="space-y-4">
+          {["Crypto News", "NFTs", "Market Updates", "Web3", "DeFi"].map(
+            (item) => (
+              <button
+                key={item}
+                onClick={() => {
+                  handleNavbarSearch(item);
+                  setIsOpen(false);
+                }}
+                className="block rounded-full w-full text-left text-gray-300 hover:text-purple-500 font-medium transition-colors py-2"
+              >
+                {item}
+              </button>
+            )
+          )}
+        </div>
+        <div className="mt-8">
+          <Input
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleSearch();
+                setIsOpen(false);
+              }
+            }}
+            placeholder="Search..."
+            className="w-full bg-gray-700 !rounded-full border-gray-600 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 text-white placeholder:text-gray-400"
+          />
+        </div>
+      </div>
+    </div>
+  );
+
 
   // Combine all news sources
   const allNews = [
@@ -635,6 +689,8 @@ export default function DiscoverView() {
   //   // fetchCoinNews(); // Fetch news based on the keyword
   // }, []); // Fetch once on component mount
 
+
+  
   useEffect(() => {
     const defaultQuery = "cryptocurrency news";
     setSearchTerm(defaultQuery);
@@ -722,7 +778,6 @@ export default function DiscoverView() {
                 )}
               </div>
 
-              {/* Mobile menu button */}
               <Button
                 variant="ghost"
                 className="md:hidden"
@@ -734,9 +789,10 @@ export default function DiscoverView() {
           </div>
         </div>
 
+
         {/* Mobile menu */}
-        {mobileMenuOpen && (
-          <div className="fixed inset-0 z-50 bg-gray-900/90 backdrop-blur-xl md:hidden">
+        {/* {mobileMenuOpen && (
+          <div className="fixed bg-black inset-0 z-50  backdrop-blur-xl md:hidden">
             <div className="fixed inset-y-0 right-0 w-full max-w-sm bg-gray-900 shadow-xl">
               <div className="flex items-center justify-between p-4 border-b border-gray-800">
                 <h2 className="text-lg font-semibold text-gray-100">Menu</h2>
@@ -780,7 +836,7 @@ export default function DiscoverView() {
               </div>
             </div>
           </div>
-        )}
+        )} */}
       </nav>
       <div className="px-4 py-6 space-y-6">
         <div className="flex items-center justify-between">
@@ -856,26 +912,22 @@ export default function DiscoverView() {
                   <Badge
                     variant="outline"
                     className={`
-                    ${
-                      item.type === "youtube"
+                    ${item.type === "youtube"
                         ? "text-red-500 border-red-500/30 bg-red-500/5"
                         : ""
-                    }
-                    ${
-                      item.type === "reddit"
+                      }
+                    ${item.type === "reddit"
                         ? "text-orange-500 border-orange-500/30 bg-orange-500/5"
                         : ""
-                    }
-                    ${
-                      item.type === "rss"
+                      }
+                    ${item.type === "rss"
                         ? "text-blue-500 border-blue-500/30 bg-blue-500/5"
                         : ""
-                    }
-                    ${
-                      item.type === "gnews"
+                      }
+                    ${item.type === "gnews"
                         ? "text-purple-500 border-purple-500/30 bg-purple-500/5"
                         : ""
-                    }
+                      }
                   `}
                   >
                     {item.source.name}
@@ -900,6 +952,11 @@ export default function DiscoverView() {
           </Link>
         ))}
       </div>
+      <MobileMenu
+        isOpen={mobileMenuOpen}
+        setIsOpen={setMobileMenuOpen}
+        handleNavbarSearch={handleNavbarSearch}
+      />
 
       <style jsx>{`
         .scrollbar-hide {

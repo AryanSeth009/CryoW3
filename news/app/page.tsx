@@ -617,7 +617,7 @@ export default function NewsPage() {
               }
             }}
             placeholder="Search..."
-            className="w-full bg-gray-700 border-gray-600 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 text-white placeholder:text-gray-400"
+            className="w-full bg-gray-700 rounded-full border-gray-600 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 text-white placeholder:text-gray-400"
           />
         </div>
       </div>
