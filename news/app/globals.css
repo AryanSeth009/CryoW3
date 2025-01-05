@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Mona+Serif&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&display=swap');
 
 :root {
   --background-dark: #0A0B0F;
@@ -42,7 +44,7 @@
   /* Add more dark mode specific overrides if needed */
 }
 *{
-  font-family:  Georgia, 'Times New Roman', Times, serif ;
+  font-family:  Georgia, 'Times New Roman', Times, serif,'Oswald', sans-serif ,'Mona Serif' ;
 }
 body {
   @apply bg-background text-foreground;

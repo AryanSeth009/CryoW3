@@ -1407,7 +1407,7 @@ export default function NewsPage() {
           <div className="space-y-8">
             <div className="flex items-center gap-4">
               <div className="h-1 w-12 bg-[#8B5CF6] rounded-[50px]" />
-              <h2 className="text-4xl font-normal font-sans">Recommended</h2>
+              <h2 className="text-4xl font-normal ">Recommended</h2>
             </div>
             <div className="space-y-6">
               {rssNews.slice(4, 5).map((article, index) => (

@@ -838,12 +838,10 @@ export default function DiscoverView() {
           </div>
         )} */}
       </nav>
-      <div className="px-4 py-6 space-y-6">
+      <div className="px-4 py-4 space-y-4 pt-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Discover</h1>
-          {/* <Button variant="ghost" size="icon">
-            <Menu className="h-6 w-6" />
-          </Button> */}
+          <h1 className="text-3xl font-serif  font-bold">Discover</h1>
+          
         </div>
 
         <p className="text-gray-400">Crypto news from all around the world</p>
