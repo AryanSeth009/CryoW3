@@ -281,8 +281,7 @@ export default function NewsPage() {
   ) => {
     try {
       const redditResponse = await fetch(
-        `https://www.reddit.com/r/CryptoCurrency/search.json?q=${query}&sort=top&limit=9${
-          afterToken ? `&after=${afterToken}` : ""
+        `https://www.reddit.com/r/CryptoCurrency/search.json?q=${query}&sort=top&limit=9${afterToken ? `&after=${afterToken}` : ""
         }`
       );
       const redditData = await redditResponse.json();
@@ -689,9 +688,8 @@ export default function NewsPage() {
 
     return (
       <Button
-        className={`fixed bottom-4 right-4 bg-purple-500 hover:bg-purple-600 text-white rounded-full p-2 transition-opacity duration-300 ${
-          isVisible ? "opacity-100" : "opacity-0"
-        }`}
+        className={`fixed bottom-4 right-4 bg-purple-500 hover:bg-purple-600 text-white rounded-full p-2 transition-opacity duration-300 ${isVisible ? "opacity-100" : "opacity-0"
+          }`}
         onClick={scrollToTop}
       >
         <ChevronUp className="h-6 w-6" />
@@ -795,16 +793,16 @@ export default function NewsPage() {
       </nav>
 
       <main className="container mx-auto p-8 px-4 py-4">
-   
+
         {/* Mobile Breaking News Section */}
         <div className="md:hidden mb-8">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold">Breaking News</h2>
-            <Link href="#" className="text-sm text-purple-500">
+            <Link href="/discover" className="text-sm text-purple-500">
               View all
             </Link>
           </div>
-          
+
           <div className="relative">
             <div className="overflow-x-auto snap-x snap-mandatory scrollbar-hide">
               <div className="flex space-x-4">
@@ -840,8 +838,8 @@ export default function NewsPage() {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold">Recommendation</h2>
             <Link href="/discover" className="text-sm text-purple-500">
-  View all
-</Link>
+              View all
+            </Link>
 
           </div>
           <div className="space-y-4">
@@ -892,8 +890,8 @@ export default function NewsPage() {
             ) : (
               <>
                 {redditNews.length === 0 &&
-                youtubeVideos.length === 0 &&
-                rssNews.length === 0 ? (
+                  youtubeVideos.length === 0 &&
+                  rssNews.length === 0 ? (
                   <div className="text-center py-10">
                     <p className="text-xl text-gray-400">
                       No news available. Please try refreshing the page.
@@ -986,8 +984,7 @@ export default function NewsPage() {
                               onClick={() =>
                                 prevPageToken &&
                                 fetchYouTubeVideos(
-                                  `${
-                                    searchTerm || "cryptocurrency"
+                                  `${searchTerm || "cryptocurrency"
                                   } ${prevPageToken}`
                                 )
                               }
@@ -1002,8 +999,7 @@ export default function NewsPage() {
                               onClick={() =>
                                 nextPageToken &&
                                 fetchYouTubeVideos(
-                                  `${
-                                    searchTerm || "cryptocurrency"
+                                  `${searchTerm || "cryptocurrency"
                                   } ${nextPageToken}`
                                 )
                               }
@@ -1198,7 +1194,7 @@ export default function NewsPage() {
                                 <Image
                                   src={
                                     article.urlToImage &&
-                                    article.urlToImage.startsWith("http")
+                                      article.urlToImage.startsWith("http")
                                       ? article.urlToImage
                                       : DEFAULT_FALLBACK_IMAGE
                                   }
@@ -1434,8 +1430,8 @@ export default function NewsPage() {
                       <Image
                         src={
                           article.urlToImage &&
-                          (article.urlToImage.startsWith("http") ||
-                            article.urlToImage.startsWith("/"))
+                            (article.urlToImage.startsWith("http") ||
+                              article.urlToImage.startsWith("/"))
                             ? article.urlToImage
                             : DEFAULT_FALLBACK_IMAGE
                         }

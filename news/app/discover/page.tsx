@@ -10,7 +10,7 @@ import InteractiveHoverButton from "@/components/ui/interactive-hover-button";
 import { useRouter } from "next/navigation";
 import { PulsatingButton } from "@/components/ui/pulsating-button";
 import { RainbowButton } from "@/components/ui/rainbow-button";
-import { Search } from "lucide-react";
+import { Fullscreen, Search } from "lucide-react";
 import {
   CryptoIcon,
   ChevronIcon,
@@ -152,14 +152,24 @@ if (typeof window !== "undefined") {
 
 const categories = [
   "All",
-  "Politic",
-  "Sport",
-  "Education",
-  "Gaming",
-  "Technology",
+  "Crypto",
+  
+ 
   "Finance",
-  "Health",
+  "Markets",
+  "NFTs",
+  "Web3",
 ];
+
+// Add function to filter news based on category
+const getFilteredNews = (news: any[], category: string) => {
+  if (category === "All") return news;
+  
+  return news.filter((item) => {
+    const searchableText = `${item.title} ${item.description || ''} ${item.source.name}`.toLowerCase();
+    return searchableText.includes(category.toLowerCase());
+  });
+};
 
 export default function DiscoverView() {
   const [news, setNews] = useState<NewsArticle[]>([]);
@@ -644,14 +654,137 @@ export default function DiscoverView() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0D0B12] to-[#1A1625] text-gray-100 md:hidden">
+    <div className="min-h-screen bg-gradient-to-br from-[#0D0B12] to-[#1A1625] text-gray-100">
       {/* Header */}
+      <nav className="sticky  top-0 z-50 bg-gray-900/90 backdrop-blur-xl border-b border-gray-800 shadow-lg">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between h-16">
+            {/* Logo */}
+            <div className="flex-shrink-0">
+              <Image
+                src="/ic_m.png"
+                alt="Logo"
+                width={300}
+                height={40}
+                className="h-8 w-auto"
+              />
+            </div>
+
+            {/* Desktop Navigation */}
+            <div className="hidden absolute  md:flex items-center space-x-6">
+              {["Crypto News", "NFTs", "Market Updates", "Web3", "DeFi"].map(
+                (item) => (
+                  <button
+                    key={item}
+                    onClick={() => handleNavbarSearch(item)}
+                    className="text-gray-300 hover:text-purple-500 font-medium transition-colors"
+                  >
+                    {item}
+                  </button>
+                )
+              )}
+            </div>
+
+            {/* Right side items */}
+            <div className="flex items-center space-x-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative text-gray-300 hover:text-purple-500"
+              >
+                <Bell className="h-5 w-5" />
+                <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-purple-500 text-[10px] font-medium text-white flex items-center justify-center">
+                  3
+                </span>
+              </Button>
+
+              {/* Auth buttons */}
+              <div className="hidden md:flex items-center space-x-2">
+                {isLoggedIn ? (
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src="https://github.com/shadcn.png" alt="Profile" />
+                    <AvatarFallback>CN</AvatarFallback>
+                  </Avatar>
+                ) : (
+                  <div className="flex space-x-2">
+                    <Button
+                      onClick={handleLogin}
+                      variant="ghost"
+                      className="text-gray-300 hover:text-purple-500"
+                    >
+                      Sign In
+                    </Button>
+                    <InteractiveHoverButton />
+                  </div>
+                )}
+              </div>
+
+              {/* Mobile menu button */}
+              <Button
+                variant="ghost"
+                className="md:hidden"
+                onClick={() => setMobileMenuOpen(true)}
+              >
+                <Menu className="h-6 w-6" />
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile menu */}
+        {mobileMenuOpen && (
+          <div className="fixed inset-0 z-50 bg-gray-900/90 backdrop-blur-xl md:hidden">
+            <div className="fixed inset-y-0 right-0 w-full max-w-sm bg-gray-900 shadow-xl">
+              <div className="flex items-center justify-between p-4 border-b border-gray-800">
+                <h2 className="text-lg font-semibold text-gray-100">Menu</h2>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <X className="h-6 w-6" />
+                </Button>
+              </div>
+              <div className="px-4 py-6 space-y-6">
+                {["Crypto News", "NFTs", "Market Updates", "Web3", "DeFi"].map(
+                  (item) => (
+                    <button
+                      key={item}
+                      onClick={() => {
+                        handleNavbarSearch(item);
+                        setMobileMenuOpen(false);
+                      }}
+                      className="block  w-full text-left px-4 py-2 text-gray-300 hover:text-purple-500 hover:bg-gray-800 rounded-lg transition-colors"
+                    >
+                      {item}
+                    </button>
+                  )
+                )}
+                {!isLoggedIn && (
+                  <div className="pt-6 border-t border-gray-800">
+                    <Button
+                      onClick={handleLogin}
+                      className="w-full mb-3"
+                      variant="outline"
+                    >
+                      Sign In
+                    </Button>
+                    <Button onClick={handleSignup} className="w-full">
+                      Sign Up
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+      </nav>
       <div className="px-4 py-6 space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold">Discover</h1>
-          <Button variant="ghost" size="icon">
+          {/* <Button variant="ghost" size="icon">
             <Menu className="h-6 w-6" />
-          </Button>
+          </Button> */}
         </div>
 
         <p className="text-gray-400">Crypto news from all around the world</p>
@@ -670,21 +803,35 @@ export default function DiscoverView() {
         {/* Categories */}
         <div className="flex overflow-x-auto space-x-2 pb-2 scrollbar-hide">
           {categories.map((category) => (
-            <Button
-              key={category}
-              variant={activeCategory === category ? "default" : "outline"}
-              className="flex-shrink-0"
-              onClick={() => setActiveCategory(category)}
-            >
-              {category}
-            </Button>
+          <Button
+            key={category}
+            variant={activeCategory === category ? "default" : "outline"}
+            className="flex-shrink-0 rounded-full"
+            onClick={() => {
+            setActiveCategory(category);
+            if (category !== "All") {
+              fetchGNews(category);
+              fetchYouTubeVideos(category);
+              fetchRedditNews(null, category);
+              fetchRSSFeeds();
+            } else {
+              const defaultQuery = "cryptocurrency news";
+              fetchGNews(defaultQuery);
+              fetchYouTubeVideos(defaultQuery);
+              fetchRedditNews(null, defaultQuery);
+              fetchRSSFeeds();
+            }
+            }}
+          >
+            {category}
+          </Button>
           ))}
         </div>
       </div>
 
       {/* Combined News Feed */}
-      <div className="px-4 space-y-4 pb-8">
-        {allNews.map((item, index) => (
+        <div className="px-4 space-y-4 pb-8">
+        {getFilteredNews(allNews, activeCategory).map((item, index) => (
           <Link
             key={index}
             href={item.url}
