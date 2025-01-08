@@ -51,7 +51,7 @@ export default function Footer() {
     <footer className="border-t rounded-xl   border-gray-800 bg-[#0D0B12]">
       <div className=" mx-auto px-4 py-12">
         {/* Main Footer Content */}
-        <div className="grid gap-8 lg:grid-cols-[2fr_1fr_1fr_1fr_1fr]">
+        <div className="grid gap-12 items-center lg:grid-cols-[2fr_1fr_1fr_1fr_1fr]">
           {/* Brand Section */}
           <div className="space-y-6">
             <div>
@@ -84,7 +84,7 @@ export default function Footer() {
 
           {/* Links Sections */}
           {Object.entries(footerLinks).map(([category, links]) => (
-            <div key={category} className="space-y-3">
+            <div key={category} className="space-y-3 pl-20">
               <h3 className="text-white font-semibold">{category}</h3>
               <ul className="space-y-3">
                 {Array.isArray(links)
