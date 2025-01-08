@@ -38,6 +38,9 @@
   --ring: 263 70% 50%;              /* Focus ring color */
 }
 
+h2 h3 h4{
+  font-family: 'Mona Serif', serif !important;
+}
 .dark {
   --background: 222 47% 11%;
   --foreground: 210 40% 98%;

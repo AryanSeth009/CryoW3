@@ -261,16 +261,14 @@ export default function NewsPage() {
   const YOUTUBE_API_KEY =
     process.env.NEXT_PUBLIC_YOUTUBE_API_KEY || "YOUR_YOUTUBE_API_KEY";
 
-
-
-
   const fetchRedditNews = async (
     afterToken: string | null = null,
     query: string = "cryptocurrency"
   ) => {
     try {
       const redditResponse = await fetch(
-        `https://www.reddit.com/r/CryptoCurrency/search.json?q=${query}&sort=top&limit=9${afterToken ? `&after=${afterToken}` : ""
+        `https://www.reddit.com/r/CryptoCurrency/search.json?q=${query}&sort=top&limit=9${
+          afterToken ? `&after=${afterToken}` : ""
         }`
       );
       const redditData = await redditResponse.json();
@@ -288,9 +286,6 @@ export default function NewsPage() {
       setError("Failed to fetch Reddit news");
     }
   };
-
-
-
 
   // Refactor fetchYouTubeVideos with useCallback
   const fetchYouTubeVideos = useCallback(
@@ -540,6 +535,9 @@ export default function NewsPage() {
   // useEffect(() => {
   //   // fetchCoinNews(); // Fetch news based on the keyword
   // }, []); // Fetch once on component mount
+  const redirectHomePage = () => {
+    router.push("/");
+  };
 
   useEffect(() => {
     const defaultQuery = "cryptocurrency news";
@@ -549,7 +547,6 @@ export default function NewsPage() {
     fetchRedditNews(null, defaultQuery);
     fetchRSSFeeds();
   }, []);
-
 
   const LoadingSkeleton = () => (
     <div className="space-y-8 animate-pulse">
@@ -650,8 +647,9 @@ export default function NewsPage() {
 
     return (
       <Button
-        className={`fixed bottom-4 right-4 bg-purple-500 hover:bg-purple-600 text-white rounded-full p-2 transition-opacity duration-300 ${isVisible ? "opacity-100" : "opacity-0"
-          }`}
+        className={`fixed bottom-4 right-4 bg-purple-500 hover:bg-purple-600 text-white rounded-full p-2 transition-opacity duration-300 ${
+          isVisible ? "opacity-100" : "opacity-0"
+        }`}
         onClick={scrollToTop}
       >
         <ChevronUp className="h-6 w-6" />
@@ -663,7 +661,7 @@ export default function NewsPage() {
     <div
       style={{
         fontFamily:
-          "ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial",
+          "'Mona Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto",
       }}
       className="min-h-screen bg-gradient-to-br from-[#0D0B12] text-gray-100 animate-gradient-x"
     >
@@ -675,169 +673,174 @@ export default function NewsPage() {
           <div className="absolute top-0 right-0 w-1/2 h-full bg-[linear-gradient(45deg,transparent_25%,rgba(123,97,255,0.1)_25%,rgba(123,97,255,0.1)_35%,transparent_35%)]" />
         </div>
       </div>
-        <nav className="sticky top-0  p-1 z-50 bg-gray-900/90 backdrop-blur-xl border-b border-gray-800 shadow-lg">
+      <nav className="sticky top-0  p-1 z-50 bg-gray-900/90 backdrop-blur-xl border-b border-gray-800 shadow-lg">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <div className="flex-shrink-0 relative w-[11rem] h-auto">
-            <Image
-            src="/ic_m.png"
-            alt="Logo"
-            width={120}
-            height={40}
-            className="object-contain"
-            priority
-            />
-          </div>
-
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-6">
-            {["Crypto News", "NFTs", "Market Updates", "Web3", "DeFi"].map(
-            (item) => (
-              <button
-              key={item}
-              onClick={() => handleNavbarSearch(item)}
-              className="text-gray-300 hover:text-purple-500 font-medium transition-colors"
-              >
-              {item}
-              </button>
-            )
-            )}
-          </div>
-
-          {/* Right side items */}
-          <div className="flex items-center space-x-4">
-            {/* Search bar - desktop */}
-            <div className="hidden md:flex relative">
-            <Input
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-              placeholder="Search..."
-              className="pl-10 h-10 w-64 rounded-full bg-gray-800 border-gray-700 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 text-white placeholder:text-gray-400"
-            />
-            <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            {/* Logo */}
+            <div className="flex-shrink-0 relative w-[11rem] h-auto">
+              <Image
+                src="/ic_m.png"
+                alt="Logo"
+                width={120}
+                height={40}
+                className="object-contain cursor-pointer"
+                priority
+                onClick={redirectHomePage}
+              />
             </div>
 
-            <Button
-            variant="ghost"
-            size="icon"
-            className="relative text-gray-300 hover:text-purple-500"
-            >
-            <Bell className="h-5 w-5" />
-            <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-purple-500 text-[10px] font-medium text-white flex items-center justify-center">
-              3
-            </span>
-            </Button>
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center space-x-6">
+              {["Crypto News", "NFTs", "Market Updates", "Web3", "DeFi"].map(
+                (item) => (
+                  <button
+                    key={item}
+                    onClick={() => handleNavbarSearch(item)}
+                    className="text-gray-300 hover:text-purple-500 font-medium transition-colors"
+                  >
+                    {item}
+                  </button>
+                )
+              )}
+            </div>
 
-            {/* Auth buttons - desktop */}
-            <div className="hidden md:flex items-center space-x-2">
-            {isLoggedIn ? (
-              <Avatar className="h-8 w-8">
-              <AvatarImage src="https://github.com/shadcn.png" alt="Profile" />
-              <AvatarFallback>CN</AvatarFallback>
-              </Avatar>
-            ) : (
-              <div className="flex space-x-2">
-              <Button
-                onClick={handleLogin}
-                className="text-white font-[20px] hover:text-purple-400 font-sans !bg-transparent"
-              >
-                Sign In
-              </Button>
-              <InteractiveHoverButton />
+            {/* Right side items */}
+            <div className="flex items-center space-x-4">
+              {/* Search bar - desktop */}
+              <div className="hidden md:flex relative">
+                <Input
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                  placeholder="Search..."
+                  className="pl-10 h-10 w-64 rounded-full bg-gray-800 border-gray-700 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 text-white placeholder:text-gray-400"
+                />
+                <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               </div>
-            )}
-            </div>
 
-            {/* Mobile menu button */}
-            <Button
-            variant="ghost"
-            className="md:hidden"
-            onClick={() => setMobileMenuOpen(true)}
-            >
-            <Menu className="h-6 w-6" />
-            </Button>
-          </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative text-gray-300 hover:text-purple-500"
+              >
+                <Bell className="h-5 w-5" />
+                <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-purple-500 text-[10px] font-medium text-white flex items-center justify-center">
+                  3
+                </span>
+              </Button>
+
+              {/* Auth buttons - desktop */}
+              <div className="hidden md:flex items-center space-x-2">
+                {isLoggedIn ? (
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage
+                      src="https://github.com/shadcn.png"
+                      alt="Profile"
+                    />
+                    <AvatarFallback>CN</AvatarFallback>
+                  </Avatar>
+                ) : (
+                  <div className="flex space-x-2">
+                    <Button
+                      onClick={handleLogin}
+                      className="text-white font-[20px] hover:text-purple-400 font-sans !bg-transparent"
+                    >
+                      Sign In
+                    </Button>
+                    <InteractiveHoverButton />
+                  </div>
+                )}
+              </div>
+
+              {/* Mobile menu button */}
+              <Button
+                variant="ghost"
+                className="md:hidden"
+                onClick={() => setMobileMenuOpen(true)}
+              >
+                <Menu className="h-6 w-6" />
+              </Button>
+            </div>
           </div>
         </div>
 
         {/* Mobile menu overlay */}
         {mobileMenuOpen && (
           <div className="fixed inset-0 z-50 bg-gray-900/90 backdrop-blur-xl md:hidden">
-          <div className="fixed inset-y-0 right-0 w-full max-w-sm bg-gray-900 shadow-xl">
-            <div className="flex items-center justify-between p-4 border-b border-gray-800">
-            <h2 className="text-lg font-semibold text-gray-100">Menu</h2>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              <X className="h-6 w-6" />
-            </Button>
-            </div>
-            
-            {/* Mobile Search */}
-            <div className="p-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <Input
-              placeholder="Search..."
-              className="pl-10 h-10 w-full rounded-full bg-gray-800 border-gray-700 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 text-white placeholder:text-gray-400"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                handleSearch();
-                setMobileMenuOpen(false);
-                }
-              }}
-              />
-            </div>
-            </div>
-
-            {/* Mobile Navigation Items */}
-            <div className="px-4 py-6 space-y-6">
-            {["Crypto News", "NFTs", "Market Updates", "Web3", "DeFi"].map(
-              (item) => (
-              <button
-                key={item}
-                onClick={() => {
-                handleNavbarSearch(item);
-                setMobileMenuOpen(false);
-                }}
-                className="block w-full text-left px-4 py-2 text-gray-300 hover:text-purple-500 hover:bg-gray-800 rounded-lg transition-colors"
-              >
-                {item}
-              </button>
-              )
-            )}
-            {!isLoggedIn && (
-              <div className="pt-6 border-gray-800">
-              <Button
-                onClick={handleLogin}
-                className="w-full mb-3"
-                variant="outline"
-              >
-                Sign In
-              </Button>
-              <Button onClick={handleSignup} className="w-full">
-                Sign Up
-              </Button>
+            <div className="fixed inset-y-0 right-0 w-full max-w-sm bg-gray-900 shadow-xl">
+              <div className="flex items-center justify-between p-4 border-b border-gray-800">
+                <h2 className="text-lg font-semibold text-gray-100">Menu</h2>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <X className="h-6 w-6" />
+                </Button>
               </div>
-            )}
+
+              {/* Mobile Search */}
+              <div className="p-4">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <Input
+                    placeholder="Search..."
+                    className="pl-10 h-10 w-full rounded-full bg-gray-800 border-gray-700 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 text-white placeholder:text-gray-400"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        handleSearch();
+                        setMobileMenuOpen(false);
+                      }
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Mobile Navigation Items */}
+              <div className="px-4 py-6 space-y-6">
+                {["Crypto News", "NFTs", "Market Updates", "Web3", "DeFi"].map(
+                  (item) => (
+                    <button
+                      key={item}
+                      onClick={() => {
+                        handleNavbarSearch(item);
+                        setMobileMenuOpen(false);
+                      }}
+                      className="block w-full text-left px-4 py-2 text-gray-300 hover:text-purple-500 hover:bg-gray-800 rounded-lg transition-colors"
+                    >
+                      {item}
+                    </button>
+                  )
+                )}
+                {!isLoggedIn && (
+                  <div className="pt-6 border-gray-800">
+                    <Button
+                      onClick={handleLogin}
+                      className="w-full mb-3"
+                      variant="outline"
+                    >
+                      Sign In
+                    </Button>
+                    <Button onClick={handleSignup} className="w-full">
+                      Sign Up
+                    </Button>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
           </div>
         )}
-        </nav>
+      </nav>
 
       <main className="container mx-auto p-8 px-4 py-4">
-
         {/* Mobile Breaking News Section */}
         <div className="md:hidden mb-8">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold">Breaking News</h2>
+            <h2 className="text-xl font-['Mona_Sans'] font-semibold">
+              Breaking News
+            </h2>
             <Link href="/discover" className="text-sm text-purple-500">
               View all
             </Link>
@@ -847,7 +850,10 @@ export default function NewsPage() {
             <div className="overflow-x-auto snap-x snap-mandatory scrollbar-hide">
               <div className="flex space-x-4">
                 {rssNews.slice(0, 3).map((article, index) => (
-                  <div key={index} className="snap-center w-[85vw] flex-shrink-0">
+                  <div
+                    key={index}
+                    className="snap-center w-[85vw] flex-shrink-0"
+                  >
                     <div className="relative h-48 rounded-xl overflow-hidden">
                       <Image
                         src={article.urlToImage || DEFAULT_FALLBACK_IMAGE}
@@ -858,8 +864,12 @@ export default function NewsPage() {
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                       <div className="absolute bottom-0 p-4 w-full">
                         <div className="flex items-center gap-2 mb-2">
-                          <Badge className="bg-blue-500">{article.source.name}</Badge>
-                          <span className="text-xs text-gray-300">6 hours ago</span>
+                          <Badge className="bg-blue-500">
+                            {article.source.name}
+                          </Badge>
+                          <span className="text-xs text-gray-300">
+                            6 hours ago
+                          </span>
                         </div>
                         <h3 className="text-white font-medium line-clamp-2">
                           {article.title}
@@ -876,11 +886,12 @@ export default function NewsPage() {
         {/* Mobile Recommendations Section */}
         <div className="md:hidden mb-8">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold">Recommendation</h2>
+            <h2 className="text-xl font-['Mona_Sans'] font-semibold">
+              Recommendation
+            </h2>
             <Link href="/discover" className="text-sm text-purple-500">
               View all
             </Link>
-
           </div>
           <div className="space-y-4">
             {[...rssNews, ...redditNews].slice(0, 5).map((article, index) => (
@@ -898,7 +909,10 @@ export default function NewsPage() {
                   />
                 </div>
                 <div className="flex-1">
-                  <Badge variant="outline" className="mb-2 text-purple-500 border-purple-500/30 bg-purple-500/5">
+                  <Badge
+                    variant="outline"
+                    className="mb-2 text-purple-500 border-purple-500/30 bg-purple-500/5"
+                  >
                     {article.source.name}
                   </Badge>
                   <h3 className="text-sm font-medium line-clamp-2 mb-1">
@@ -956,7 +970,7 @@ export default function NewsPage() {
                               </Badge>
                               <span>12 hours ago</span>
                             </div>
-                            <h1 className="text-3xl font-bold leading-tight">
+                            <h1 className="text-3xl font-bold font-['Mona_Sans'] leading-tight">
                               {rssNews[0].title}
                             </h1>
                             <div className="flex gap-2">
@@ -1013,7 +1027,7 @@ export default function NewsPage() {
                     ) : (
                       <section className="mb-12 flex flex-col">
                         <div className="flex mb-4">
-                          <h2 className="text-4xl w-full font-normal font-sans flex items-center justify-between">
+                          <h2 className="text-4xl w-full font-normal font-['Mona_Sans'] flex items-center justify-between">
                             YouTube Videos
                           </h2>
                           <div className="flex gap-2 mb-4 items-end justify-end">
@@ -1407,7 +1421,9 @@ export default function NewsPage() {
           <div className="space-y-8">
             <div className="flex items-center gap-4">
               <div className="h-1 w-12 bg-[#8B5CF6] rounded-[50px]" />
-              <h2 className="text-4xl font-normal ">Recommended</h2>
+              <h2 className="text-4xl font-['Mona_Sans'] font-normal">
+                Recommended
+              </h2>
             </div>
             <div className="space-y-6">
               {rssNews.slice(4, 5).map((article, index) => (
@@ -1502,13 +1518,8 @@ export default function NewsPage() {
             </div>
           </div>
         </div>
-        <div className="ml-8 mr-8">
-          <Newsletter />
-          <Footer
-            onTagClick={function (tag: string): void {
-              throw new Error("Function not implemented.");
-            }}
-          />
+        <div className="p-6">
+          <Footer />
         </div>
       </main>
       <MobileMenu

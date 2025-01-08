@@ -156,8 +156,9 @@ const getFilteredNews = (news: any[], category: string) => {
   if (category === "All") return news;
 
   return news.filter((item) => {
-    const searchableText = `${item.title} ${item.description || ""} ${item.source.name
-      }`.toLowerCase();
+    const searchableText = `${item.title} ${item.description || ""} ${
+      item.source.name
+    }`.toLowerCase();
     return searchableText.includes(category.toLowerCase());
   });
 };
@@ -305,7 +306,8 @@ export default function DiscoverView() {
   ) => {
     try {
       const redditResponse = await fetch(
-        `https://www.reddit.com/r/CryptoCurrency/search.json?q=${query}&sort=top&limit=9${afterToken ? `&after=${afterToken}` : ""
+        `https://www.reddit.com/r/CryptoCurrency/search.json?q=${query}&sort=top&limit=9${
+          afterToken ? `&after=${afterToken}` : ""
         }`
       );
       const redditData = await redditResponse.json();
@@ -336,7 +338,7 @@ export default function DiscoverView() {
       if (!response.ok) {
         const errorData = await response.json();
         console.error("Error fetching news:", errorData); // Log error data
-        // throw new Error("Failed to fetch news");
+        throw new Error("Failed to fetch news");
       }
 
       const data = await response.json();
@@ -440,7 +442,6 @@ export default function DiscoverView() {
       </div>
     </div>
   );
-
 
   // Combine all news sources
   const allNews = [
@@ -591,11 +592,10 @@ export default function DiscoverView() {
 
   const handleNavbarSearch = (query: string) => {
     setSearchTerm(query);
-    // fetchCoinNews();
-    // fetchNews(query);
     fetchYouTubeVideos(query);
     fetchRedditNews(null, query);
     fetchRSSFeeds(); // Keep RSS feeds as they are crypto-specific already
+    fetchNews(query); // Fetch news based on the selected category
   };
 
   const handleSearch = () => {
@@ -689,13 +689,11 @@ export default function DiscoverView() {
   //   // fetchCoinNews(); // Fetch news based on the keyword
   // }, []); // Fetch once on component mount
 
-
-  
   useEffect(() => {
     const defaultQuery = "cryptocurrency news";
     setSearchTerm(defaultQuery);
     fetchGNews(defaultQuery);
-    fetchNews(defaultQuery);
+    // fetchNews(defaultQuery);
     fetchYouTubeVideos(defaultQuery);
     fetchRedditNews(null, defaultQuery);
     fetchRSSFeeds();
@@ -789,7 +787,6 @@ export default function DiscoverView() {
           </div>
         </div>
 
-
         {/* Mobile menu */}
         {/* {mobileMenuOpen && (
           <div className="fixed bg-black inset-0 z-50  backdrop-blur-xl md:hidden">
@@ -838,10 +835,12 @@ export default function DiscoverView() {
           </div>
         )} */}
       </nav>
-      <div className="px-4 py-4 space-y-4 pt-6">
+      <div className="px-4 py-6 space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-serif  font-bold">Discover</h1>
-          
+          <h1 className="text-2xl font-bold">Discover</h1>
+          {/* <Button variant="ghost" size="icon">
+            <Menu className="h-6 w-6" />
+          </Button> */}
         </div>
 
         <p className="text-gray-400">Crypto news from all around the world</p>
@@ -910,22 +909,26 @@ export default function DiscoverView() {
                   <Badge
                     variant="outline"
                     className={`
-                    ${item.type === "youtube"
+                    ${
+                      item.type === "youtube"
                         ? "text-red-500 border-red-500/30 bg-red-500/5"
                         : ""
-                      }
-                    ${item.type === "reddit"
+                    }
+                    ${
+                      item.type === "reddit"
                         ? "text-orange-500 border-orange-500/30 bg-orange-500/5"
                         : ""
-                      }
-                    ${item.type === "rss"
+                    }
+                    ${
+                      item.type === "rss"
                         ? "text-blue-500 border-blue-500/30 bg-blue-500/5"
                         : ""
-                      }
-                    ${item.type === "gnews"
+                    }
+                    ${
+                      item.type === "gnews"
                         ? "text-purple-500 border-purple-500/30 bg-purple-500/5"
                         : ""
-                      }
+                    }
                   `}
                   >
                     {item.source.name}
