@@ -674,7 +674,7 @@ export default function NewsPage() {
         </div>
       </div>
       <nav className="sticky top-0  p-1 z-50 bg-gray-900/90 backdrop-blur-xl border-b border-gray-800 shadow-lg">
-        <div className="container mx-auto px-4">
+        <div className=" mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <div className="flex-shrink-0 relative w-[11rem] h-auto">
@@ -713,9 +713,29 @@ export default function NewsPage() {
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                   placeholder="Search..."
-                  className="pl-10 h-10 w-64 rounded-full bg-gray-800 border-gray-700 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 text-white placeholder:text-gray-400"
+                  className="pl-14 h-10 w-64 rounded-full bg-gray-800 border-gray-700 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 text-white placeholder:text-gray-400"
                 />
-                <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <svg
+                  className="absolute cursor-text left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  width="12"
+                  height="12"
+                 
+                  fill="currentColor"
+                >
+                  <path d="M18.031 16.6168L22.3137 20.8995L20.8995 22.3137L16.6168 18.031C15.0769 19.263 13.124 20 11 20C6.032 20 2 15.968 2 11C2 6.032 6.032 2 11 2C15.968 2 20 6.032 20 11C20 13.124 19.263 15.0769 18.031 16.6168ZM16.0247 15.8748C17.2475 14.6146 18 12.8956 18 11C18 7.1325 14.8675 4 11 4C7.1325 4 4 7.1325 4 11C4 14.8675 7.1325 18 11 18C12.8956 18 14.6146 17.2475 15.8748 16.0247L16.0247 15.8748Z"></path>
+                </svg>{" "}
+                {/* <svg
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  width="12"
+                  height="12"
+                  fill="rgba(255,255,255,1)"
+                >
+                  <path d="M18.031 16.6168L22.3137 20.8995L20.8995 22.3137L16.6168 18.031C15.0769 19.263 13.124 20 11 20C6.032 20 2 15.968 2 11C2 6.032 6.032 2 11 2C15.968 2 20 6.032 20 11C20 13.124 19.263 15.0769 18.031 16.6168Z"></path>
+                </svg> */}
               </div>
 
               <Button
@@ -782,7 +802,7 @@ export default function NewsPage() {
               {/* Mobile Search */}
               <div className="p-4">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  {/* <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" /> */}
                   <Input
                     placeholder="Search..."
                     className="pl-10 h-10 w-full rounded-full bg-gray-800 border-gray-700 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 text-white placeholder:text-gray-400"
@@ -894,7 +914,7 @@ export default function NewsPage() {
             </Link>
           </div>
           <div className="space-y-4">
-            {[...rssNews, ...redditNews].slice(0, 5).map((article, index) => (
+            {[...rssNews, ...redditNews].slice(0, 10).map((article, index) => (
               <Link
                 key={index}
                 href={article.url}
@@ -1518,7 +1538,7 @@ export default function NewsPage() {
             </div>
           </div>
         </div>
-        <div className="p-6">
+        <div className="">
           <Footer />
         </div>
       </main>

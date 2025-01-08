@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import InteractiveHoverButton from "@/components/ui/interactive-hover-button";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { PulsatingButton } from "@/components/ui/pulsating-button";
 import { RainbowButton } from "@/components/ui/rainbow-button";
 import { Fullscreen, Search } from "lucide-react";
@@ -170,16 +170,7 @@ export default function DiscoverView() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
   const itemsPerPage = 6;
-  const [youtubeVideos, setYoutubeVideos] = useState<
-    {
-      id: { videoId: string };
-      snippet: {
-        thumbnails: { medium: { url: string } };
-        title: string;
-        channelTitle: string;
-      };
-    }[]
-  >([]);
+  const [youtubeVideos, setYoutubeVideos] = useState<any[]>([]);
   const [nextPageToken, setNextPageToken] = useState<string | null>(null);
   const [prevPageToken, setPrevPageToken] = useState<string | null>(null);
   const [redditNews, setRedditNews] = useState<NewsArticle[]>([]);
@@ -472,7 +463,9 @@ export default function DiscoverView() {
       publishedAt: new Date().toISOString(),
     })),
   ];
-
+  const redirectHomePage = () => {
+    router.push("/");
+  };
   // Example useEffect to fetch videos
 
   const fetchRSSFeeds = async () => {
@@ -721,6 +714,7 @@ export default function DiscoverView() {
                 width={300}
                 height={40}
                 className="h-8 w-auto"
+                onClick={redirectHomePage}
               />
             </div>
 
