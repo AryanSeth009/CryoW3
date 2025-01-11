@@ -26,6 +26,10 @@ import { Bell, BellIcon, Menu, X, ChevronUp, Search } from "lucide-react";
 import Newsletter from "@/components/NewsFooter/Newsletter";
 import Footer from "@/components/NewsFooter/Footer";
 import RippleButton from "@/components/ui/ripple-button";
+import SubscribeButton from "@/components/SubscribeButton";
+import SearchBox from "@/components/SeachBox";
+import CryptoPrice from "@/components/CryptoTicker";
+import CryptoTicker from "@/components/CryptoTicker";
 
 // Inters
 interface NewsArticle {
@@ -70,16 +74,16 @@ interface YouTubeVideo {
 if (typeof window !== "undefined") {
   const style = document.createElement("style");
   style.textContent = `
-    @keyframes gradient {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-    .animate-gradient-x {
-      background-size: 200% 200%;
-      animation: gradient 15s ease infinite;
-    }
-  `;
+      @keyframes gradient {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+      }
+      .animate-gradient-x {
+        background-size: 200% 200%;
+        animation: gradient 15s ease infinite;
+      }
+    `;
   document.head.appendChild(style);
 }
 
@@ -127,16 +131,16 @@ const gradientAnimation = {
 if (typeof window !== "undefined") {
   const style = document.createElement("style");
   style.textContent = `
-    @keyframes gradient {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-    .animate-gradient-x {
-      background-size: 200% 200%;
-      animation: gradient 15s ease infinite;
-    }
-  `;
+      @keyframes gradient {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+      }
+      .animate-gradient-x {
+        background-size: 200% 200%;
+        animation: gradient 15s ease infinite;
+      }
+    `;
   document.head.appendChild(style);
 }
 
@@ -569,10 +573,14 @@ export default function NewsPage() {
     isOpen,
     setIsOpen,
     handleNavbarSearch,
+    handleLogin,
+    handleSignup,
   }: {
     isOpen: boolean;
     setIsOpen: (isOpen: boolean) => void;
     handleNavbarSearch: (query: string) => void;
+    handleLogin: () => void;
+    handleSignup: () => void;
   }) => (
     <div className={`fixed inset-0 z-50 ${isOpen ? "block" : "hidden"}`}>
       <div
@@ -581,8 +589,9 @@ export default function NewsPage() {
       />
       <div className="absolute right-0 top-0 bottom-0 w-64 bg-gray-800 p-6 shadow-xl">
         <div className="flex justify-between items-center mb-8">
-          <h2 className="text-xl font-bold text-purple-500">Menu</h2>
-
+          <h2 className="text-xl font-bold text-purple-500">
+            Welcome to Cryow3times
+          </h2>
           <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>
             <X className="h-6 w-6" />
           </Button>
@@ -603,19 +612,37 @@ export default function NewsPage() {
             )
           )}
         </div>
-        <div className="mt-8">
-          <Input
+        <div className="mt-8 flex items-center gap-2">
+          <SearchBox
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                handleSearch();
-                setIsOpen(false);
-              }
-            }}
-            placeholder="Search..."
-            className="w-full bg-gray-700 rounded-full border-gray-600 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 text-white placeholder:text-gray-400"
+            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
           />
+        </div>
+
+        <div className="mt-6 space-y-4  flex flex-row gap-4 align-middle items-center">
+          <div className="flex flex-row items-center border border-white rounded-xl p-1 gap-0 align-middle">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              width="18"
+              height="18"
+              fill="currentColor"
+            >
+              <path d="M4 22C4 17.5817 7.58172 14 12 14C16.4183 14 20 17.5817 20 22H4ZM12 13C8.685 13 6 10.315 6 7C6 3.685 8.685 1 12 1C15.315 1 18 3.685 18 7C18 10.315 15.315 13 12 13Z"></path>
+            </svg>{" "}
+            <Button
+              onClick={() => {
+                handleLogin();
+                setIsOpen(false);
+              }}
+              className="w-auto bg-transparent p-2 rounded-xl font-sans  text-white"
+            >
+              Sign In
+            </Button>
+          </div>
+
+          <SubscribeButton />
         </div>
       </div>
     </div>
@@ -707,35 +734,30 @@ export default function NewsPage() {
             {/* Right side items */}
             <div className="flex items-center space-x-4">
               {/* Search bar - desktop */}
+
               <div className="hidden md:flex relative">
-                <Input
+                <SearchBox
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                />
+                {/* <Input
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                   placeholder="Search..."
                   className="pl-14 h-10 w-64 rounded-full bg-gray-800 border-gray-700 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 text-white placeholder:text-gray-400"
-                />
-                <svg
+                /> */}
+                {/* <svg
                   className="absolute cursor-text left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4"
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
                   width="12"
                   height="12"
-                 
                   fill="currentColor"
                 >
                   <path d="M18.031 16.6168L22.3137 20.8995L20.8995 22.3137L16.6168 18.031C15.0769 19.263 13.124 20 11 20C6.032 20 2 15.968 2 11C2 6.032 6.032 2 11 2C15.968 2 20 6.032 20 11C20 13.124 19.263 15.0769 18.031 16.6168ZM16.0247 15.8748C17.2475 14.6146 18 12.8956 18 11C18 7.1325 14.8675 4 11 4C7.1325 4 4 7.1325 4 11C4 14.8675 7.1325 18 11 18C12.8956 18 14.6146 17.2475 15.8748 16.0247L16.0247 15.8748Z"></path>
-                </svg>{" "}
-                {/* <svg
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  width="12"
-                  height="12"
-                  fill="rgba(255,255,255,1)"
-                >
-                  <path d="M18.031 16.6168L22.3137 20.8995L20.8995 22.3137L16.6168 18.031C15.0769 19.263 13.124 20 11 20C6.032 20 2 15.968 2 11C2 6.032 6.032 2 11 2C15.968 2 20 6.032 20 11C20 13.124 19.263 15.0769 18.031 16.6168Z"></path>
-                </svg> */}
+                </svg>{" "} */}
               </div>
 
               <Button
@@ -789,7 +811,9 @@ export default function NewsPage() {
           <div className="fixed inset-0 z-50 bg-gray-900/90 backdrop-blur-xl md:hidden">
             <div className="fixed inset-y-0 right-0 w-full max-w-sm bg-gray-900 shadow-xl">
               <div className="flex items-center justify-between p-4 border-b border-gray-800">
-                <h2 className="text-lg font-semibold text-gray-100">Menu</h2>
+                <h2 className="text-lg font-semibold text-gray-100">
+                  Welcome to Cryow3Times
+                </h2>
                 <Button
                   variant="ghost"
                   size="icon"
@@ -815,6 +839,16 @@ export default function NewsPage() {
                       }
                     }}
                   />
+                  <svg
+                    className="absolute cursor-text left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    width="12"
+                    height="12"
+                    fill="currentColor"
+                  >
+                    <path d="M18.031 16.6168L22.3137 20.8995L20.8995 22.3137L16.6168 18.031C15.0769 19.263 13.124 20 11 20C6.032 20 2 15.968 2 11C2 6.032 6.032 2 11 2C15.968 2 20 6.032 20 11C20 13.124 19.263 15.0769 18.031 16.6168ZM16.0247 15.8748C17.2475 14.6146 18 12.8956 18 11C18 7.1325 14.8675 4 11 4C7.1325 4 4 7.1325 4 11C4 14.8675 7.1325 18 11 18C12.8956 18 14.6146 17.2475 15.8748 16.0247L16.0247 15.8748Z"></path>
+                  </svg>{" "}
                 </div>
               </div>
 
@@ -843,9 +877,7 @@ export default function NewsPage() {
                     >
                       Sign In
                     </Button>
-                    <Button onClick={handleSignup} className="w-full">
-                      Sign Up
-                    </Button>
+                    <InteractiveHoverButton />
                   </div>
                 )}
               </div>
@@ -853,8 +885,12 @@ export default function NewsPage() {
           </div>
         )}
       </nav>
+      <div className="mb-0 ">
+        <CryptoTicker />
+      </div>
 
       <main className="container mx-auto p-8 px-4 py-4">
+      
         {/* Mobile Breaking News Section */}
         <div className="md:hidden mb-8">
           <div className="flex items-center justify-between mb-4">
@@ -864,7 +900,9 @@ export default function NewsPage() {
             <Link href="/discover" className="text-sm text-purple-500">
               View all
             </Link>
+            
           </div>
+        
 
           <div className="relative">
             <div className="overflow-x-auto snap-x snap-mandatory scrollbar-hide">
@@ -1366,71 +1404,71 @@ export default function NewsPage() {
                     </section>
 
                     {/* <section className="mb-12 flex flex-col">
-                      <div className="flex mb-4">
-                        <h2 className="text-4xl w-full font-normal font-sans flex items-center justify-between">
-                          CoinDesk & CoinTelegraph News
-                        </h2>
-                      </div>
-                      <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-3">
-                        {loading && <p className="text-gray-500">Loading...</p>}
-                        {error && <p className="text-red-500">{error}</p>}
-                        {coinNews.length > 0 ? (
-                          coinNews.map((article, index) => (
-                            <Link
-                              key={index}
-                              href={article.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="group"
-                            >
-                              <Card className="bg-[#0A0B0F]/60 backdrop-blur-xl border-white/10 rounded-xl hover:rounded-2xl hover:border-[#8B5CF6]/50 hover:border-purple-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/10 transform hover:-translate-y-1">
-                                <div className="relative h-48 rounded-t-xl overflow-hidden">
-                                  <Image
-                                    src={article.imageUrl}
-                                    alt={article.title}
-                                    fill
-                                    className="object-cover transition-transform duration-700 group-hover:scale-105"
-                                  />
-                                  <div className="absolute inset-0 bg-gradient-to-t from-[#231d30] via-transparent opacity-50" />
-                                  <Badge className="absolute top-4 left-4 bg-purple-500/90 hover:bg-purple-600">
-                                    {article.source.name}
-                                  </Badge>
-                                </div>
-                                <div className="p-4">
-                                  <h3 className="font-semibold text-md leading-tight group-hover:text-purple-500 transition-colors line-clamp-2 mb-3">
-                                    {article.title}
-                                  </h3>
-                                  <div className="flex items-center gap-4 text-sm text-gray-400">
-                                    <div className="flex items-center gap-2">
-                                      <Avatar className="h-6 w-6 border-2 border-purple-500/30">
-                                        <Image
-                                          src={article.source.icon}
-                                          alt="Source"
-                                          width={24}
-                                          height={24}
-                                        />
-                                      </Avatar>
-                                    </div>
-                                    <span>•</span>
-                                    <div className="flex items-center gap-2 opacity-60">
-                                      <span>
-                                        {new Date(
-                                          article.publishedAt
-                                        ).toLocaleDateString()}
-                                      </span>
+                        <div className="flex mb-4">
+                          <h2 className="text-4xl w-full font-normal font-sans flex items-center justify-between">
+                            CoinDesk & CoinTelegraph News
+                          </h2>
+                        </div>
+                        <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-3">
+                          {loading && <p className="text-gray-500">Loading...</p>}
+                          {error && <p className="text-red-500">{error}</p>}
+                          {coinNews.length > 0 ? (
+                            coinNews.map((article, index) => (
+                              <Link
+                                key={index}
+                                href={article.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="group"
+                              >
+                                <Card className="bg-[#0A0B0F]/60 backdrop-blur-xl border-white/10 rounded-xl hover:rounded-2xl hover:border-[#8B5CF6]/50 hover:border-purple-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/10 transform hover:-translate-y-1">
+                                  <div className="relative h-48 rounded-t-xl overflow-hidden">
+                                    <Image
+                                      src={article.imageUrl}
+                                      alt={article.title}
+                                      fill
+                                      className="object-cover transition-transform duration-700 group-hover:scale-105"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-[#231d30] via-transparent opacity-50" />
+                                    <Badge className="absolute top-4 left-4 bg-purple-500/90 hover:bg-purple-600">
+                                      {article.source.name}
+                                    </Badge>
+                                  </div>
+                                  <div className="p-4">
+                                    <h3 className="font-semibold text-md leading-tight group-hover:text-purple-500 transition-colors line-clamp-2 mb-3">
+                                      {article.title}
+                                    </h3>
+                                    <div className="flex items-center gap-4 text-sm text-gray-400">
+                                      <div className="flex items-center gap-2">
+                                        <Avatar className="h-6 w-6 border-2 border-purple-500/30">
+                                          <Image
+                                            src={article.source.icon}
+                                            alt="Source"
+                                            width={24}
+                                            height={24}
+                                          />
+                                        </Avatar>
+                                      </div>
+                                      <span>•</span>
+                                      <div className="flex items-center gap-2 opacity-60">
+                                        <span>
+                                          {new Date(
+                                            article.publishedAt
+                                          ).toLocaleDateString()}
+                                        </span>
+                                      </div>
                                     </div>
                                   </div>
-                                </div>
-                              </Card>
-                            </Link>
-                          ))
-                        ) : (
-                          <p className="text-gray-500">
-                            No news articles available.
-                          </p>
-                        )}
-                      </div>
-                    </section> */}
+                                </Card>
+                              </Link>
+                            ))
+                          ) : (
+                            <p className="text-gray-500">
+                              No news articles available.
+                            </p>
+                          )}
+                        </div>
+                      </section> */}
                   </>
                 )}
               </>
@@ -1546,6 +1584,8 @@ export default function NewsPage() {
         isOpen={mobileMenuOpen}
         setIsOpen={setMobileMenuOpen}
         handleNavbarSearch={handleNavbarSearch}
+        handleLogin={handleLogin}
+        handleSignup={handleSignup}
       />
       <ScrollToTopButton />
       <style jsx>{`

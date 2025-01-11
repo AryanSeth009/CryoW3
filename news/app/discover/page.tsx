@@ -27,6 +27,8 @@ import { Bell, BellIcon, Menu, X, ChevronUp } from "lucide-react";
 import Newsletter from "@/components/NewsFooter/Newsletter";
 import Footer from "@/components/NewsFooter/Footer";
 import RippleButton from "@/components/ui/ripple-button";
+import SearchBox from "@/components/SeachBox";
+import SubscribeButton from "@/components/SubscribeButton";
 
 // Inters
 interface NewsArticle {
@@ -382,10 +384,14 @@ export default function DiscoverView() {
     isOpen,
     setIsOpen,
     handleNavbarSearch,
+    
+    handleSignup,
   }: {
     isOpen: boolean;
     setIsOpen: (isOpen: boolean) => void;
     handleNavbarSearch: (query: string) => void;
+   
+    handleSignup: () => void;
   }) => (
     <div className={`fixed inset-0 z-50 ${isOpen ? "block" : "hidden"}`}>
       <div
@@ -394,8 +400,9 @@ export default function DiscoverView() {
       />
       <div className="absolute right-0 top-0 bottom-0 w-64 bg-gray-800 p-6 shadow-xl">
         <div className="flex justify-between items-center mb-8">
-          <h2 className="text-xl font-bold text-purple-500">Menu</h2>
-
+          <h2 className="text-xl font-bold text-purple-500">
+            Welcome to Cryow3times
+          </h2>
           <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>
             <X className="h-6 w-6" />
           </Button>
@@ -409,26 +416,44 @@ export default function DiscoverView() {
                   handleNavbarSearch(item);
                   setIsOpen(false);
                 }}
-                className="block rounded-full w-full text-left text-gray-300 hover:text-purple-500 font-medium transition-colors py-2"
+                className="block w-full text-left text-gray-300 hover:text-purple-500 font-medium transition-colors py-2"
               >
                 {item}
               </button>
             )
           )}
         </div>
-        <div className="mt-8">
-          <Input
+        <div className="mt-8 flex items-center gap-2">
+          <SearchBox
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                handleSearch();
-                setIsOpen(false);
-              }
-            }}
-            placeholder="Search..."
-            className="w-full bg-gray-700 !rounded-full border-gray-600 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 text-white placeholder:text-gray-400"
+            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
           />
+        </div>
+
+        <div className="mt-6 space-y-4  flex flex-row gap-4 align-middle items-center">
+          <div className="flex flex-row items-center border border-white rounded-xl p-1 gap-0 align-middle">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              width="18"
+              height="18"
+              fill="currentColor"
+            >
+              <path d="M4 22C4 17.5817 7.58172 14 12 14C16.4183 14 20 17.5817 20 22H4ZM12 13C8.685 13 6 10.315 6 7C6 3.685 8.685 1 12 1C15.315 1 18 3.685 18 7C18 10.315 15.315 13 12 13Z"></path>
+            </svg>{" "}
+            <Button
+              onClick={() => {
+                handleLogin()
+                setIsOpen(false);
+              }}
+              className="w-auto bg-transparent p-2 rounded-xl font-sans  text-white"
+            >
+              Sign In
+            </Button>
+          </div>
+
+          <SubscribeButton />
         </div>
       </div>
     </div>
@@ -950,8 +975,8 @@ export default function DiscoverView() {
       <MobileMenu
         isOpen={mobileMenuOpen}
         setIsOpen={setMobileMenuOpen}
-        handleNavbarSearch={handleNavbarSearch}
-      />
+        handleNavbarSearch={handleNavbarSearch} 
+         handleSignup={handleSignup}     />
 
       <style jsx>{`
         .scrollbar-hide {

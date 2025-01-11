@@ -37,6 +37,19 @@
   --input: 222 47% 20%;             /* Input background */
   --ring: 263 70% 50%;              /* Focus ring color */
 }
+@keyframes scroll-right {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.animate-scroll-right {
+  animation: scroll-right 30s linear infinite;
+}
+
 
 h2 h3 h4{
   font-family: 'Mona Serif', serif !important;
