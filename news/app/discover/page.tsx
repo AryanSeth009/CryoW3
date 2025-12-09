@@ -717,6 +717,13 @@ export default function DiscoverView() {
     fetchRSSFeeds();
   }, []);
 
+  function getImageSrc(url: string | undefined) {
+    if (!url || url === "self" || url === "default") {
+      return DEFAULT_FALLBACK_IMAGE;
+    }
+    return url;
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0D0B12] to-[#1A1625] text-gray-100">
       {/* Header */}
@@ -917,7 +924,7 @@ export default function DiscoverView() {
             <Card className="flex gap-4 rounded-xl  bg-[#1A1625] border-none overflow-hidden hover:bg-[#231d30] transition-colors">
               <div className="relative w-24 h-24 flex-shrink-0">
                 <Image
-                  src={item.urlToImage || DEFAULT_FALLBACK_IMAGE}
+                  src={getImageSrc(item.urlToImage)}
                   alt={item.title}
                   fill
                   className="object-cover"
